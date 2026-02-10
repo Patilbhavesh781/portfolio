@@ -11,7 +11,7 @@ const Stats = () => {
     const fetchStats = async () => {
       try {
         const response = await api.get("/stats");
-        setStats(response.data);
+        setStats(response.data?.data || null);
       } catch (err) {
         setError("Failed to load stats.");
       } finally {
@@ -27,10 +27,10 @@ const Stats = () => {
   if (!stats) return null;
 
   const items = [
-    { label: "Projects Completed", value: stats.projects || 0 },
-    { label: "Years of Experience", value: stats.experience || 0 },
-    { label: "Happy Clients", value: stats.clients || 0 },
-    { label: "Certifications", value: stats.certifications || 0 },
+    { label: "Projects", value: stats.projects || 0 },
+    { label: "Blogs", value: stats.blogs || 0 },
+    { label: "Unread Messages", value: stats.messages || 0 },
+    { label: "Testimonials", value: stats.testimonials || 0 },
   ];
 
   return (

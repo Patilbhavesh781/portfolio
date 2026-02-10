@@ -15,7 +15,7 @@ export const sendContactMessage = async (messageData) => {
  */
 export const getAllContactMessages = async (params = {}) => {
   const response = await api.get(CONTACT_ENDPOINT, { params });
-  return response.data;
+  return response.data?.data || [];
 };
 
 /**

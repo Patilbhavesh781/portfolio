@@ -2,6 +2,35 @@ import Blog from "../models/Blog.js";
 import cloudinary from "../config/cloudinary.js";
 import logger from "../utils/logger.js";
 import validateObjectId from "../utils/validateObjectId.js";
+import slugify from "slugify";
+import mongoose from "mongoose";
+import fs from "fs";
+
+const createUniqueSlug = async (value, excludeId = null) => {
+  const base =
+    slugify(value || "blog", { lower: true, strict: true, trim: true }) ||
+    "blog";
+  let slug = base;
+  let counter = 2;
+
+  while (
+    await Blog.findOne({
+      slug,
+      ...(excludeId ? { _id: { $ne: excludeId } } : {}),
+    })
+  ) {
+    slug = `${base}-${counter}`;
+    counter += 1;
+  }
+
+  return slug;
+};
+
+const uploadToCloudinary = async (filePath, folder) => {
+  const result = await cloudinary.uploader.upload(filePath, { folder });
+  fs.unlink(filePath, () => {});
+  return { public_id: result.public_id, url: result.secure_url };
+};
 
 // @desc    Get all blogs (public)
 // @route   GET /api/blogs
@@ -33,7 +62,10 @@ export const getBlogs = async (req, res, next) => {
 // @access  Public
 export const getBlogBySlug = async (req, res, next) => {
   try {
-    const blog = await Blog.findOne({ slug: req.params.slug });
+    const idOrSlug = req.params.slug;
+    const blog = mongoose.Types.ObjectId.isValid(idOrSlug)
+      ? await Blog.findById(idOrSlug)
+      : await Blog.findOne({ slug: idOrSlug });
 
     if (!blog) {
       return res.status(404).json({ message: "Blog not found" });
@@ -55,7 +87,26 @@ export const getBlogBySlug = async (req, res, next) => {
 // @access  Private/Admin
 export const createBlog = async (req, res, next) => {
   try {
-    const blogData = req.body;
+    const blogData = { ...req.body };
+    const slugSource = blogData.slug || blogData.title;
+    blogData.slug = await createUniqueSlug(slugSource);
+
+    if (typeof blogData.tags === "string") {
+      blogData.tags = blogData.tags
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean);
+    }
+
+    if (req.file) {
+      blogData.coverImage = await uploadToCloudinary(
+        req.file.path,
+        "portfolio/blogs"
+      );
+    } else if (blogData.coverImageUrl || blogData.thumbnail) {
+      const url = blogData.coverImageUrl || blogData.thumbnail;
+      blogData.coverImage = { url };
+    }
 
     const blog = await Blog.create(blogData);
 
@@ -73,7 +124,30 @@ export const updateBlog = async (req, res, next) => {
   try {
     validateObjectId(req.params.id);
 
-    const blog = await Blog.findByIdAndUpdate(req.params.id, req.body, {
+    const updateData = { ...req.body };
+    if (updateData.slug || updateData.title) {
+      const slugSource = updateData.slug || updateData.title;
+      updateData.slug = await createUniqueSlug(slugSource, req.params.id);
+    }
+
+    if (typeof updateData.tags === "string") {
+      updateData.tags = updateData.tags
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean);
+    }
+
+    if (req.file) {
+      updateData.coverImage = await uploadToCloudinary(
+        req.file.path,
+        "portfolio/blogs"
+      );
+    } else if (updateData.coverImageUrl || updateData.thumbnail) {
+      const url = updateData.coverImageUrl || updateData.thumbnail;
+      updateData.coverImage = { url };
+    }
+
+    const blog = await Blog.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
       runValidators: true,
     });

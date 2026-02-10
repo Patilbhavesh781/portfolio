@@ -7,7 +7,7 @@ const BLOG_ENDPOINT = "/blogs";
  */
 export const getAllBlogs = async (params = {}) => {
   const response = await api.get(BLOG_ENDPOINT, { params });
-  return response.data;
+  return response.data?.data || [];
 };
 
 /**
@@ -15,7 +15,7 @@ export const getAllBlogs = async (params = {}) => {
  */
 export const getBlogById = async (id) => {
   const response = await api.get(`${BLOG_ENDPOINT}/${id}`);
-  return response.data;
+  return response.data?.data || null;
 };
 
 /**
@@ -23,7 +23,7 @@ export const getBlogById = async (id) => {
  */
 export const createBlog = async (blogData) => {
   const response = await api.post(BLOG_ENDPOINT, blogData);
-  return response.data;
+  return response.data?.data || null;
 };
 
 /**
@@ -31,7 +31,7 @@ export const createBlog = async (blogData) => {
  */
 export const updateBlog = async (id, blogData) => {
   const response = await api.put(`${BLOG_ENDPOINT}/${id}`, blogData);
-  return response.data;
+  return response.data?.data || null;
 };
 
 /**

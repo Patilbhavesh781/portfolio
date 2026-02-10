@@ -10,8 +10,8 @@ const Experience = () => {
   useEffect(() => {
     const fetchExperiences = async () => {
       try {
-        const response = await api.get("/experience");
-        setExperiences(response.data);
+        const response = await api.get("/experiences");
+        setExperiences(response.data?.data || []);
       } catch (err) {
         setError("Failed to load experience.");
       } finally {
@@ -40,15 +40,20 @@ const Experience = () => {
             >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  {exp.role}
+                  {exp.title}
                 </h3>
                 <span className="text-sm text-gray-500 dark:text-gray-400">
-                  {exp.startDate} – {exp.endDate || "Present"}
+                  {exp.startDate ? new Date(exp.startDate).toLocaleDateString() : ""} - {exp.isCurrent ? "Present" : exp.endDate ? new Date(exp.endDate).toLocaleDateString() : "Present"}
                 </span>
               </div>
               <p className="text-indigo-600 dark:text-indigo-400 font-medium mb-2">
                 {exp.company}
               </p>
+              {exp.location && (
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                  {exp.location}
+                </p>
+              )}
               <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-3">
                 {exp.description}
               </p>
@@ -73,3 +78,4 @@ const Experience = () => {
 };
 
 export default Experience;
+

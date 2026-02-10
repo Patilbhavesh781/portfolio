@@ -13,12 +13,14 @@ const ManageExperience = () => {
   const [editingExperience, setEditingExperience] = useState(null);
 
   const [formData, setFormData] = useState({
-    role: "",
+    title: "",
     company: "",
     description: "",
     technologies: "",
     startDate: "",
     endDate: "",
+    isCurrent: false,
+    location: "",
   });
 
   useEffect(() => {
@@ -27,8 +29,8 @@ const ManageExperience = () => {
 
   const fetchExperiences = async () => {
     try {
-      const response = await api.get("/experience");
-      setExperiences(response.data);
+      const response = await api.get("/experiences");
+      setExperiences(response.data?.data || []);
     } catch (err) {
       setError("Failed to load experience.");
     } finally {
@@ -39,12 +41,14 @@ const ManageExperience = () => {
   const openCreateModal = () => {
     setEditingExperience(null);
     setFormData({
-      role: "",
+      title: "",
       company: "",
       description: "",
       technologies: "",
       startDate: "",
       endDate: "",
+      isCurrent: false,
+      location: "",
     });
     setIsModalOpen(true);
   };
@@ -52,12 +56,18 @@ const ManageExperience = () => {
   const openEditModal = (experience) => {
     setEditingExperience(experience);
     setFormData({
-      role: experience.role || "",
+      title: experience.title || "",
       company: experience.company || "",
       description: experience.description || "",
       technologies: experience.technologies?.join(", ") || "",
-      startDate: experience.startDate || "",
-      endDate: experience.endDate || "",
+      startDate: experience.startDate
+        ? new Date(experience.startDate).toISOString().slice(0, 10)
+        : "",
+      endDate: experience.endDate
+        ? new Date(experience.endDate).toISOString().slice(0, 10)
+        : "",
+      isCurrent: !!experience.isCurrent,
+      location: experience.location || "",
     });
     setIsModalOpen(true);
   };
@@ -68,7 +78,8 @@ const ManageExperience = () => {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
   };
 
   const handleSubmit = async (e) => {
@@ -83,9 +94,9 @@ const ManageExperience = () => {
       };
 
       if (editingExperience) {
-        await api.put(`/experience/${editingExperience._id}`, payload);
+        await api.put(`/experiences/${editingExperience._id}`, payload);
       } else {
-        await api.post("/experience", payload);
+        await api.post("/experiences", payload);
       }
 
       await fetchExperiences();
@@ -98,7 +109,7 @@ const ManageExperience = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this experience?")) return;
     try {
-      await api.delete(`/experience/${id}`);
+      await api.delete(`/experiences/${id}`);
       setExperiences(experiences.filter((e) => e._id !== id));
     } catch (err) {
       alert("Failed to delete experience.");
@@ -124,7 +135,7 @@ const ManageExperience = () => {
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Role
+                Title
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Company
@@ -141,13 +152,13 @@ const ManageExperience = () => {
             {experiences.map((exp) => (
               <tr key={exp._id}>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {exp.role}
+                  {exp.title}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
                   {exp.company}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                  {exp.startDate} – {exp.endDate || "Present"}
+                  {exp.startDate ? new Date(exp.startDate).toLocaleDateString() : ""} - {exp.isCurrent ? "Present" : exp.endDate ? new Date(exp.endDate).toLocaleDateString() : "Present"}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
                   <Button size="sm" variant="secondary" onClick={() => openEditModal(exp)}>
@@ -164,20 +175,28 @@ const ManageExperience = () => {
       </div>
 
       {/* Modal */}
-      {isModalOpen && (
-        <Modal
-          title={editingExperience ? "Edit Experience" : "Add Experience"}
-          onClose={closeModal}
-        >
+      <Modal
+        isOpen={isModalOpen}
+        title={editingExperience ? "Edit Experience" : "Add Experience"}
+        onClose={closeModal}
+      >
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="text"
-              name="role"
-              value={formData.role}
+              name="title"
+              value={formData.title}
               onChange={handleChange}
-              placeholder="Role / Position"
+              placeholder="Title / Position"
               required
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <input
+              type="text"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              placeholder="Location"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <input
               type="text"
@@ -186,7 +205,7 @@ const ManageExperience = () => {
               onChange={handleChange}
               placeholder="Company Name"
               required
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <textarea
               name="description"
@@ -195,7 +214,7 @@ const ManageExperience = () => {
               placeholder="Description"
               rows="4"
               required
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <input
               type="text"
@@ -203,7 +222,7 @@ const ManageExperience = () => {
               value={formData.technologies}
               onChange={handleChange}
               placeholder="Technologies (comma separated)"
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <input
@@ -212,16 +231,26 @@ const ManageExperience = () => {
                 value={formData.startDate}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border rounded-lg"
+                className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <input
                 type="date"
                 name="endDate"
                 value={formData.endDate}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-lg"
+                disabled={formData.isCurrent}
+                className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
+            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+              <input
+                type="checkbox"
+                name="isCurrent"
+                checked={formData.isCurrent}
+                onChange={handleChange}
+              />
+              Current role
+            </label>
 
             <div className="flex justify-end gap-3 pt-4">
               <Button type="button" variant="secondary" onClick={closeModal}>
@@ -232,10 +261,12 @@ const ManageExperience = () => {
               </Button>
             </div>
           </form>
-        </Modal>
-      )}
+      </Modal>
     </div>
   );
 };
 
 export default ManageExperience;
+
+
+

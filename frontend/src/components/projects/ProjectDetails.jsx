@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import api from "../../services/api";
+import { getProjectById } from "../../services/projectService";
 import Loader from "../common/Loader";
 import Button from "../common/Button";
 
@@ -13,8 +13,8 @@ const ProjectDetails = () => {
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        const response = await api.get(`/projects/${id}`);
-        setProject(response.data);
+        const data = await getProjectById(id);
+        setProject(data);
       } catch (err) {
         setError("Failed to load project details.");
       } finally {
@@ -57,7 +57,7 @@ const ProjectDetails = () => {
             {project.images.map((image, index) => (
               <img
                 key={index}
-                src={image}
+                src={image?.url || image}
                 alt={`${project.title} screenshot ${index + 1}`}
                 className="w-full h-64 object-cover rounded-xl shadow"
               />

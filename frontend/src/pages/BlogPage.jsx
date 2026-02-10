@@ -36,7 +36,7 @@ const BlogPage = () => {
   if (error) return <p className="text-center text-red-600">{error}</p>;
   if (!blog) return null;
 
-  return <BlogDetails blog={blog} />;
+  return <BlogDetails blog={blog} loading={loading} error={error} />;
 };
 
 export default BlogPage;

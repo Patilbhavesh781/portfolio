@@ -23,8 +23,8 @@ const AdminLayout = () => {
     <div className="min-h-screen flex bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <AdminSidebar />
       <div className="flex-1 flex flex-col">
-        <Navbar />
-        <main className="pt-16 p-4 md:p-6">
+        <Navbar variant="static" />
+        <main className="p-4 md:p-6">
           <Outlet />
         </main>
       </div>

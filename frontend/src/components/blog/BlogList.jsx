@@ -1,30 +1,5 @@
-import { useEffect, useState } from "react";
 import BlogCard from "./BlogCard";
-import Loader from "../common/Loader";
-import api from "../../services/api";
-
-const BlogList = () => {
-  const [blogs, setBlogs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        const response = await api.get("/blogs");
-        setBlogs(response.data);
-      } catch (err) {
-        setError("Failed to load blogs.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBlogs();
-  }, []);
-
-  if (loading) return <Loader text="Loading blogs..." />;
-  if (error) return <p className="text-center text-red-600">{error}</p>;
+const BlogList = ({ blogs = [] }) => {
 
   return (
     <section className="py-20 bg-gray-50 dark:bg-gray-800">

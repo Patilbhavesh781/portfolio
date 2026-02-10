@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 const BlogCard = ({ blog }) => {
   return (
     <div className="bg-white dark:bg-gray-900 rounded-xl shadow hover:shadow-lg transition overflow-hidden flex flex-col">
-      {blog.thumbnail && (
+      {(blog.thumbnail || blog.coverImage?.url) && (
         <div className="h-48 w-full overflow-hidden">
           <img
-            src={blog.thumbnail}
+            src={blog.thumbnail || blog.coverImage?.url}
             alt={blog.title}
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
           />
@@ -23,7 +23,7 @@ const BlogCard = ({ blog }) => {
 
         <div className="mt-auto flex items-center justify-between">
           <Link
-            to={`/blogs/${blog._id}`}
+            to={`/blog/${blog.slug || blog._id}`}
             className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
           >
             Read More →

@@ -1,30 +1,5 @@
-import { useEffect, useState } from "react";
 import ProjectCard from "./ProjectCard";
-import Loader from "../common/Loader";
-import api from "../../services/api";
-
-const ProjectList = () => {
-  const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await api.get("/projects");
-        setProjects(response.data);
-      } catch (err) {
-        setError("Failed to load projects.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProjects();
-  }, []);
-
-  if (loading) return <Loader text="Loading projects..." />;
-  if (error) return <p className="text-center text-red-600">{error}</p>;
+const ProjectList = ({ projects = [] }) => {
 
   return (
     <section className="py-20 bg-gray-50 dark:bg-gray-800">

@@ -13,7 +13,7 @@ const Hero = () => {
           <h1 className="text-4xl sm:text-5xl xl:text-6xl font-bold leading-tight text-gray-900 dark:text-gray-100">
             Hi, I'm{" "}
             <span className="text-indigo-600 dark:text-indigo-400">
-              Your Name
+              Bhavesh Patil
             </span>
             <br />
             Full Stack Developer
@@ -49,7 +49,7 @@ const Hero = () => {
             <img
               src="/assets/images/profile.png"
               alt="Profile"
-              className="w-56 h-56 sm:w-72 sm:h-72 object-cover rounded-full shadow-xl"
+              className="w-56 h-56 sm:w-72 sm:h-72 object-cover object-top rounded-full shadow-xl"
               onError={(e) => {
                 e.target.style.display = "none";
               }}

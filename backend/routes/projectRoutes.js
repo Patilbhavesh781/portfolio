@@ -16,8 +16,26 @@ router.get("/", getProjects);
 router.get("/:slug", getProjectBySlug);
 
 // Admin routes
-router.post("/", protect, admin, upload.array("images", 5), createProject);
-router.put("/:id", protect, admin, upload.array("images", 5), updateProject);
+router.post(
+  "/",
+  protect,
+  admin,
+  upload.fields([
+    { name: "images", maxCount: 5 },
+    { name: "thumbnail", maxCount: 1 },
+  ]),
+  createProject
+);
+router.put(
+  "/:id",
+  protect,
+  admin,
+  upload.fields([
+    { name: "images", maxCount: 5 },
+    { name: "thumbnail", maxCount: 1 },
+  ]),
+  updateProject
+);
 router.delete("/:id", protect, admin, deleteProject);
 
 export default router;

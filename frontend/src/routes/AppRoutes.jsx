@@ -19,6 +19,10 @@ import ManageBlogs from "../components/admin/ManageBlogs";
 import ManageSkills from "../components/admin/ManageSkills";
 import ManageExperience from "../components/admin/ManageExperience";
 import ManageMessages from "../components/admin/ManageMessages";
+import ManageEducation from "../components/admin/ManageEducation";
+import ManageCertifications from "../components/admin/ManageCertifications";
+import ManageAbout from "../components/admin/ManageAbout";
+import ManageTestimonials from "../components/admin/ManageTestimonials";
 
 const AppRoutes = () => {
   return (
@@ -41,12 +45,16 @@ const AppRoutes = () => {
 
       {/* Admin Routes */}
       <Route element={<AdminLayout />}>
-        <Route path="/admin/dashboard" element={<Dashboard />} />
-        <Route path="/admin/projects" element={<ManageProjects />} />
-        <Route path="/admin/blogs" element={<ManageBlogs />} />
-        <Route path="/admin/skills" element={<ManageSkills />} />
-        <Route path="/admin/experience" element={<ManageExperience />} />
-        <Route path="/admin/messages" element={<ManageMessages />} />
+      <Route path="/admin/dashboard" element={<Dashboard />} />
+      <Route path="/admin/about" element={<ManageAbout />} />
+      <Route path="/admin/projects" element={<ManageProjects />} />
+      <Route path="/admin/blogs" element={<ManageBlogs />} />
+      <Route path="/admin/skills" element={<ManageSkills />} />
+      <Route path="/admin/experience" element={<ManageExperience />} />
+      <Route path="/admin/education" element={<ManageEducation />} />
+      <Route path="/admin/certifications" element={<ManageCertifications />} />
+      <Route path="/admin/testimonials" element={<ManageTestimonials />} />
+      <Route path="/admin/messages" element={<ManageMessages />} />
       </Route>
     </Routes>
   );

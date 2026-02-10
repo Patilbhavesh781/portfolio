@@ -15,11 +15,22 @@ const ManageMessages = () => {
   const fetchMessages = async () => {
     try {
       const response = await api.get("/contact");
-      setMessages(response.data);
+      setMessages(response.data?.data || []);
     } catch (err) {
       setError("Failed to load messages.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleMarkRead = async (id) => {
+    try {
+      await api.put(`/contact/${id}/read`);
+      setMessages(
+        messages.map((m) => (m._id === id ? { ...m, isRead: true } : m))
+      );
+    } catch (err) {
+      alert("Failed to mark message as read.");
     }
   };
 
@@ -62,6 +73,9 @@ const ManageMessages = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Message
               </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Status
+              </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Actions
               </th>
@@ -82,7 +96,15 @@ const ManageMessages = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400 max-w-xs truncate">
                   {msg.message}
                 </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                  {msg.isRead ? "Read" : "Unread"}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                  {!msg.isRead && (
+                    <Button size="sm" variant="secondary" onClick={() => handleMarkRead(msg._id)}>
+                      Mark Read
+                    </Button>
+                  )}
                   <Button size="sm" variant="outline" onClick={() => handleDelete(msg._id)}>
                     Delete
                   </Button>

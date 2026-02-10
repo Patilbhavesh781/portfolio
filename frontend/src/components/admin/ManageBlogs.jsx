@@ -19,7 +19,9 @@ const ManageBlogs = () => {
     thumbnail: "",
     author: "",
     readTime: "",
+    tags: "",
   });
+  const [coverFile, setCoverFile] = useState(null);
 
   useEffect(() => {
     fetchBlogs();
@@ -28,7 +30,7 @@ const ManageBlogs = () => {
   const fetchBlogs = async () => {
     try {
       const response = await api.get("/blogs");
-      setBlogs(response.data);
+      setBlogs(response.data?.data || []);
     } catch (err) {
       setError("Failed to load blogs.");
     } finally {
@@ -45,7 +47,9 @@ const ManageBlogs = () => {
       thumbnail: "",
       author: "",
       readTime: "",
+      tags: "",
     });
+    setCoverFile(null);
     setIsModalOpen(true);
   };
 
@@ -55,10 +59,12 @@ const ManageBlogs = () => {
       title: blog.title || "",
       content: blog.content || "",
       excerpt: blog.excerpt || "",
-      thumbnail: blog.thumbnail || "",
+      thumbnail: blog.coverImage?.url || blog.thumbnail || "",
       author: blog.author || "",
       readTime: blog.readTime || "",
+      tags: blog.tags?.join(", ") || "",
     });
+    setCoverFile(null);
     setIsModalOpen(true);
   };
 
@@ -74,10 +80,41 @@ const ManageBlogs = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      if (editingBlog) {
-        await api.put(`/blogs/${editingBlog._id}`, formData);
+      const hasFile = !!coverFile;
+      if (hasFile) {
+        const data = new FormData();
+        data.append("title", formData.title);
+        data.append("content", formData.content);
+        data.append("excerpt", formData.excerpt);
+        data.append("author", formData.author);
+        data.append("readTime", formData.readTime);
+        data.append("tags", formData.tags);
+        if (formData.thumbnail) data.append("coverImageUrl", formData.thumbnail);
+        data.append("coverImage", coverFile);
+
+        if (editingBlog) {
+          await api.put(`/blogs/${editingBlog._id}`, data, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+        } else {
+          await api.post("/blogs", data, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+        }
       } else {
-        await api.post("/blogs", formData);
+        const payload = {
+          ...formData,
+          tags: formData.tags
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean),
+          coverImageUrl: formData.thumbnail || undefined,
+        };
+        if (editingBlog) {
+          await api.put(`/blogs/${editingBlog._id}`, payload);
+        } else {
+          await api.post("/blogs", payload);
+        }
       }
 
       await fetchBlogs();
@@ -156,11 +193,11 @@ const ManageBlogs = () => {
       </div>
 
       {/* Modal */}
-      {isModalOpen && (
-        <Modal
-          title={editingBlog ? "Edit Blog" : "Add Blog"}
-          onClose={closeModal}
-        >
+      <Modal
+        isOpen={isModalOpen}
+        title={editingBlog ? "Edit Blog" : "Add Blog"}
+        onClose={closeModal}
+      >
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="text"
@@ -169,7 +206,7 @@ const ManageBlogs = () => {
               onChange={handleChange}
               placeholder="Blog Title"
               required
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <input
               type="text"
@@ -177,7 +214,7 @@ const ManageBlogs = () => {
               value={formData.author}
               onChange={handleChange}
               placeholder="Author Name"
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <input
               type="number"
@@ -185,23 +222,43 @@ const ManageBlogs = () => {
               value={formData.readTime}
               onChange={handleChange}
               placeholder="Read Time (minutes)"
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <input
               type="text"
               name="thumbnail"
               value={formData.thumbnail}
               onChange={handleChange}
-              placeholder="Thumbnail URL"
-              className="w-full px-4 py-2 border rounded-lg"
+              placeholder="Cover Image URL"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
+            <input
+              type="text"
+              name="tags"
+              value={formData.tags}
+              onChange={handleChange}
+              placeholder="Tags (comma separated)"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <div>
+              <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
+                Cover Image Upload
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setCoverFile(e.target.files?.[0] || null)}
+                className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
             <textarea
               name="excerpt"
               value={formData.excerpt}
               onChange={handleChange}
               placeholder="Short excerpt"
               rows="3"
-              className="w-full px-4 py-2 border rounded-lg"
+              required
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <textarea
               name="content"
@@ -210,7 +267,7 @@ const ManageBlogs = () => {
               placeholder="Blog content"
               rows="6"
               required
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
 
             <div className="flex justify-end gap-3 pt-4">
@@ -222,10 +279,10 @@ const ManageBlogs = () => {
               </Button>
             </div>
           </form>
-        </Modal>
-      )}
+      </Modal>
     </div>
   );
 };
 
 export default ManageBlogs;
+

@@ -1,16 +1,42 @@
-import express from "express";
-import {
-  getStats,
-  updateStats,
-} from "../controllers/statsController.js";
-import { protect, admin } from "../middlewares/authMiddleware.js";
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
+import logger from "../utils/logger.js";
 
-const router = express.Router();
+// Protect routes: verify JWT and attach user to request
+export const protect = async (req, res, next) => {
+  let token;
 
-// Public route
-router.get("/", getStats);
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer ")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  }
 
-// Admin route
-router.put("/", protect, admin, updateStats);
+  if (!token) {
+    return res.status(401).json({ message: "Not authorized, no token" });
+  }
 
-export default router;
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select("-password");
+
+    if (!user || user.isActive === false) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    logger.error(error);
+    return res.status(401).json({ message: "Not authorized, token failed" });
+  }
+};
+
+// Admin-only middleware
+export const admin = (req, res, next) => {
+  if (req.user && req.user.role === "admin") {
+    return next();
+  }
+  return res.status(403).json({ message: "Admin access required" });
+};

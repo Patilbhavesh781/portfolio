@@ -18,9 +18,20 @@ const blogSchema = new mongoose.Schema(
       required: [true, "Blog excerpt is required"],
       maxlength: 300,
     },
+    author: {
+      type: String,
+      trim: true,
+    },
+    author: {
+      type: String,
+      trim: true,
+    },
     content: {
       type: String,
       required: [true, "Blog content is required"],
+    },
+    thumbnail: {
+      type: String,
     },
     coverImage: {
       public_id: String,

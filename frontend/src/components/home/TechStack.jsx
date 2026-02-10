@@ -11,7 +11,7 @@ const TechStack = () => {
     const fetchSkills = async () => {
       try {
         const response = await api.get("/skills");
-        setSkills(response.data);
+        setSkills(response.data?.data || []);
       } catch (err) {
         setError("Failed to load skills.");
       } finally {
@@ -26,7 +26,7 @@ const TechStack = () => {
   if (error) return <p className="text-center text-red-600">{error}</p>;
 
   const groupedSkills = skills.reduce((acc, skill) => {
-    const category = skill.category || "Other";
+    const category = skill.category || "other";
     if (!acc[category]) acc[category] = [];
     acc[category].push(skill);
     return acc;
@@ -43,7 +43,7 @@ const TechStack = () => {
           {Object.entries(groupedSkills).map(([category, skills]) => (
             <div key={category}>
               <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-6">
-                {category}
+                {category.charAt(0).toUpperCase() + category.slice(1)}
               </h3>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
@@ -64,7 +64,7 @@ const TechStack = () => {
                     </p>
                     {skill.level && (
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {skill.level}
+                        {skill.level}%
                       </p>
                     )}
                   </div>

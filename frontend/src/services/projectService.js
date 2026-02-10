@@ -7,7 +7,7 @@ const PROJECT_ENDPOINT = "/projects";
  */
 export const getAllProjects = async (params = {}) => {
   const response = await api.get(PROJECT_ENDPOINT, { params });
-  return response.data;
+  return response.data?.data || [];
 };
 
 /**
@@ -15,7 +15,7 @@ export const getAllProjects = async (params = {}) => {
  */
 export const getProjectById = async (id) => {
   const response = await api.get(`${PROJECT_ENDPOINT}/${id}`);
-  return response.data;
+  return response.data?.data || null;
 };
 
 /**
@@ -23,7 +23,7 @@ export const getProjectById = async (id) => {
  */
 export const createProject = async (projectData) => {
   const response = await api.post(PROJECT_ENDPOINT, projectData);
-  return response.data;
+  return response.data?.data || null;
 };
 
 /**
@@ -31,7 +31,7 @@ export const createProject = async (projectData) => {
  */
 export const updateProject = async (id, projectData) => {
   const response = await api.put(`${PROJECT_ENDPOINT}/${id}`, projectData);
-  return response.data;
+  return response.data?.data || null;
 };
 
 /**

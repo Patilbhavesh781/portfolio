@@ -11,7 +11,7 @@ const Certifications = () => {
     const fetchCertifications = async () => {
       try {
         const response = await api.get("/certifications");
-        setCertifications(response.data);
+        setCertifications(response.data?.data || []);
       } catch (err) {
         setError("Failed to load certifications.");
       } finally {
@@ -38,22 +38,28 @@ const Certifications = () => {
               key={cert._id}
               className="p-6 bg-white dark:bg-gray-900 rounded-xl shadow hover:shadow-md transition"
             >
-              {cert.logo && (
-                <img
-                  src={cert.logo}
-                  alt={cert.title}
-                  className="w-16 h-16 object-contain mb-4"
-                />
-              )}
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 {cert.title}
               </h3>
               <p className="text-indigo-600 dark:text-indigo-400 font-medium mb-1">
-                {cert.issuer}
+                {cert.organization}
               </p>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                Issued: {cert.issueDate}
+                Issued:{" "}
+                {cert.issueDate
+                  ? new Date(cert.issueDate).toLocaleDateString()
+                  : "N/A"}
               </p>
+              {cert.expirationDate && (
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                  Expires: {new Date(cert.expirationDate).toLocaleDateString()}
+                </p>
+              )}
+              {cert.credentialId && (
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  Credential ID: {cert.credentialId}
+                </p>
+              )}
               {cert.credentialUrl && (
                 <a
                   href={cert.credentialUrl}
@@ -73,3 +79,4 @@ const Certifications = () => {
 };
 
 export default Certifications;
+

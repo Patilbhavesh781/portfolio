@@ -8,9 +8,9 @@ import { setSEO } from "../utils/seo";
 const Home = () => {
   useEffect(() => {
     setSEO({
-      title: "Home | Your Name - Full Stack Developer",
+      title: "Home | Bhavesh Patil - Full Stack Developer",
       description:
-        "Portfolio of Your Name, a full stack MERN developer specializing in scalable web applications, APIs, and modern UI/UX.",
+        "Portfolio of Bhavesh Patil, a full stack MERN developer specializing in scalable web applications, APIs, and modern UI/UX.",
       keywords:
         "Full Stack Developer, MERN Stack, React Developer, Portfolio, JavaScript, Node.js, MongoDB",
     });

@@ -6,6 +6,8 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // Load user from localStorage / token on app start
   useEffect(() => {
@@ -24,14 +26,28 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (credentials) => {
-    const userData = await loginUser(credentials);
-    setUser(userData);
-    return userData;
+    setLoginLoading(true);
+    setError(null);
+    try {
+      const userData = await loginUser(credentials);
+      setUser(userData);
+      return userData;
+    } catch (err) {
+      const message =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Login failed. Please try again.";
+      setError(message);
+      throw err;
+    } finally {
+      setLoginLoading(false);
+    }
   };
 
   const logout = async () => {
     await logoutUser();
     setUser(null);
+    setError(null);
   };
 
   const isAuthenticated = !!user;
@@ -39,6 +55,8 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     loading,
+    loginLoading,
+    error,
     login,
     logout,
     isAuthenticated,

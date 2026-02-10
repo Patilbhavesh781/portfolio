@@ -11,7 +11,7 @@ const Testimonials = () => {
     const fetchTestimonials = async () => {
       try {
         const response = await api.get("/testimonials");
-        setTestimonials(response.data);
+        setTestimonials(response.data?.data || []);
       } catch (err) {
         setError("Failed to load testimonials.");
       } finally {
@@ -42,9 +42,9 @@ const Testimonials = () => {
                 “{testimonial.message}”
               </p>
               <div className="flex items-center space-x-4">
-                {testimonial.avatar && (
+                {(testimonial.avatar?.url || testimonial.avatar) && (
                   <img
-                    src={testimonial.avatar}
+                    src={testimonial.avatar?.url || testimonial.avatar}
                     alt={testimonial.name}
                     className="w-12 h-12 rounded-full object-cover"
                   />

@@ -37,6 +37,10 @@ const projectSchema = new mongoose.Schema(
     liveUrl: {
       type: String,
     },
+    thumbnail: {
+      public_id: String,
+      url: String,
+    },
     images: [
       {
         public_id: String,

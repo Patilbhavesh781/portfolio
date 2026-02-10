@@ -12,10 +12,10 @@ const Footer = () => {
   ];
 
   const socialLinks = [
-    { name: "GitHub", url: "https://github.com/yourusername" },
-    { name: "LinkedIn", url: "https://linkedin.com/in/yourusername" },
-    { name: "Twitter", url: "https://twitter.com/yourusername" },
-    { name: "Email", url: "mailto:youremail@example.com" },
+    { name: "GitHub", url: "https://github.com/Patilbhavesh781" },
+    { name: "LinkedIn", url: "https://linkedin.com/in/patilbhavesh781" },
+    { name: "Twitter", url: "https://twitter.com/patilbhavesh781" },
+    { name: "Email", url: "mailto:patilbhavesh781@gmail.com" },
   ];
 
   return (

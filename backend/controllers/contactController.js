@@ -18,19 +18,31 @@ export const sendContactMessage = async (req, res, next) => {
       ipAddress: req.ip,
     });
 
-    // Send email notification to admin
-    await sendEmail({
-      to: process.env.ADMIN_EMAIL,
-      subject: `New Contact Message: ${subject || "No Subject"}`,
-      html: `
-        <h3>New Contact Message</h3>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Subject:</strong> ${subject || "N/A"}</p>
-        <p><strong>Message:</strong></p>
-        <p>${message}</p>
-      `,
-    });
+    // Send email notification to admin (optional)
+    const canSendEmail =
+      process.env.ADMIN_EMAIL &&
+      process.env.MAIL_HOST &&
+      process.env.MAIL_USER &&
+      process.env.MAIL_PASS;
+
+    if (canSendEmail) {
+      try {
+        await sendEmail({
+          to: process.env.ADMIN_EMAIL,
+          subject: `New Contact Message: ${subject || "No Subject"}`,
+          html: `
+            <h3>New Contact Message</h3>
+            <p><strong>Name:</strong> ${name}</p>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Subject:</strong> ${subject || "N/A"}</p>
+            <p><strong>Message:</strong></p>
+            <p>${message}</p>
+          `,
+        });
+      } catch (emailError) {
+        logger.error(emailError);
+      }
+    }
 
     res.status(201).json({
       success: true,

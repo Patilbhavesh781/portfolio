@@ -11,7 +11,7 @@ const Education = () => {
     const fetchEducation = async () => {
       try {
         const response = await api.get("/education");
-        setEducation(response.data);
+        setEducation(response.data?.data || []);
       } catch (err) {
         setError("Failed to load education.");
       } finally {
@@ -43,12 +43,17 @@ const Education = () => {
                   {edu.degree}
                 </h3>
                 <span className="text-sm text-gray-500 dark:text-gray-400">
-                  {edu.startDate} – {edu.endDate || "Present"}
+                  {edu.startYear} - {edu.endYear || "Present"}
                 </span>
               </div>
               <p className="text-indigo-600 dark:text-indigo-400 font-medium mb-2">
                 {edu.institution}
               </p>
+              {edu.description && (
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  {edu.description}
+                </p>
+              )}
               {edu.fieldOfStudy && (
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                   Field: {edu.fieldOfStudy}
@@ -68,3 +73,4 @@ const Education = () => {
 };
 
 export default Education;
+

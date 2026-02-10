@@ -8,6 +8,8 @@ import { setSEO } from "../utils/seo";
 const Projects = () => {
   const [projects, setProjects] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [technologies, setTechnologies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -27,6 +29,19 @@ const Projects = () => {
         const data = await getAllProjects();
         setProjects(data);
         setFilteredProjects(data);
+        setCategories(
+          Array.from(new Set(data.map((p) => p.category).filter(Boolean)))
+        );
+        setTechnologies(
+          Array.from(
+            new Set(
+              data
+                .flatMap((p) => p.technologies || [])
+                .map((t) => t.trim())
+                .filter(Boolean)
+            )
+          )
+        );
       } catch (err) {
         setError("Failed to load projects.");
       } finally {
@@ -40,16 +55,14 @@ const Projects = () => {
   const handleFilterChange = (filters) => {
     let filtered = [...projects];
 
-    if (filters.tech && filters.tech !== "all") {
+    if (filters.technology) {
       filtered = filtered.filter((project) =>
-        project.technologies?.includes(filters.tech)
+        project.technologies?.includes(filters.technology)
       );
     }
 
-    if (filters.type && filters.type !== "all") {
-      filtered = filtered.filter(
-        (project) => project.type === filters.type
-      );
+    if (filters.category) {
+      filtered = filtered.filter((project) => project.category === filters.category);
     }
 
     setFilteredProjects(filtered);
@@ -67,7 +80,11 @@ const Projects = () => {
         </p>
       </div>
 
-      <ProjectFilter onFilterChange={handleFilterChange} />
+      <ProjectFilter
+        onFilterChange={handleFilterChange}
+        categories={categories}
+        technologies={technologies}
+      />
       <ProjectList projects={filteredProjects} />
     </div>
   );

@@ -1,25 +1,8 @@
-import { useEffect, useState } from "react";
-import api from "../../services/api";
+import { useState } from "react";
 
-const ProjectFilter = ({ onFilterChange }) => {
-  const [categories, setCategories] = useState([]);
-  const [technologies, setTechnologies] = useState([]);
+const ProjectFilter = ({ onFilterChange, categories = [], technologies = [] }) => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedTech, setSelectedTech] = useState("all");
-
-  useEffect(() => {
-    const fetchFilters = async () => {
-      try {
-        const response = await api.get("/projects/filters");
-        setCategories(response.data.categories || []);
-        setTechnologies(response.data.technologies || []);
-      } catch (err) {
-        console.error("Failed to load project filters.");
-      }
-    };
-
-    fetchFilters();
-  }, []);
 
   const handleFilterChange = (category, tech) => {
     const filter = {

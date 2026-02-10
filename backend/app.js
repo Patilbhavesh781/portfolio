@@ -14,6 +14,7 @@ import certificationRoutes from "./routes/certificationRoutes.js";
 import testimonialRoutes from "./routes/testimonialRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
 import statsRoutes from "./routes/statsRoutes.js";
+import aboutRoutes from "./routes/aboutRoutes.js";
 
 import { notFound, errorHandler } from "./middlewares/errorMiddleware.js";
 
@@ -22,7 +23,13 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors());
+const allowedOrigin = process.env.CLIENT_URL || "http://localhost:5173";
+app.use(
+  cors({
+    origin: allowedOrigin,
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
@@ -42,6 +49,7 @@ app.use("/api/certifications", certificationRoutes);
 app.use("/api/testimonials", testimonialRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/stats", statsRoutes);
+app.use("/api/about", aboutRoutes);
 
 // Health check
 app.get("/", (req, res) => {

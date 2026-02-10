@@ -48,9 +48,12 @@ export const getCurrentUser = async () => {
   // Try to fetch fresh user data from backend
   try {
     const response = await api.get(`${AUTH_ENDPOINT}/me`);
-    const user = response.data;
-    localStorage.setItem("authUser", JSON.stringify(user));
-    return user;
+    const user = response.data?.user;
+    if (user) {
+      localStorage.setItem("authUser", JSON.stringify(user));
+      return user;
+    }
+    return null;
   } catch (error) {
     // If backend fails, fallback to localStorage user
     if (storedUser) {

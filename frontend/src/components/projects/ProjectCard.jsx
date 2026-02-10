@@ -5,10 +5,10 @@ const ProjectCard = ({ project }) => {
   return (
     <div className="bg-white dark:bg-gray-900 rounded-xl shadow hover:shadow-lg transition overflow-hidden flex flex-col">
       {/* Image */}
-      {project.thumbnail && (
+      {(project.thumbnail?.url || project.thumbnail) && (
         <div className="h-48 w-full overflow-hidden">
           <img
-            src={project.thumbnail}
+            src={project.thumbnail?.url || project.thumbnail}
             alt={project.title}
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
           />
@@ -40,7 +40,7 @@ const ProjectCard = ({ project }) => {
 
         {/* Actions */}
         <div className="mt-auto flex items-center justify-between gap-3">
-          <Link to={`/projects/${project._id}`}>
+          <Link to={`/projects/${project.slug || project._id}`}>
             <Button size="sm" variant="secondary">
               Details
             </Button>

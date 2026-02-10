@@ -20,7 +20,10 @@ const ManageProjects = () => {
     githubUrl: "",
     category: "",
     thumbnail: "",
+    imageUrls: "",
   });
+  const [thumbnailFile, setThumbnailFile] = useState(null);
+  const [imageFiles, setImageFiles] = useState([]);
 
   useEffect(() => {
     fetchProjects();
@@ -29,7 +32,7 @@ const ManageProjects = () => {
   const fetchProjects = async () => {
     try {
       const response = await api.get("/projects");
-      setProjects(response.data);
+      setProjects(response.data?.data || []);
     } catch (err) {
       setError("Failed to load projects.");
     } finally {
@@ -47,7 +50,10 @@ const ManageProjects = () => {
       githubUrl: "",
       category: "",
       thumbnail: "",
+      imageUrls: "",
     });
+    setThumbnailFile(null);
+    setImageFiles([]);
     setIsModalOpen(true);
   };
 
@@ -60,8 +66,11 @@ const ManageProjects = () => {
       liveUrl: project.liveUrl || "",
       githubUrl: project.githubUrl || "",
       category: project.category || "",
-      thumbnail: project.thumbnail || "",
+      thumbnail: project.thumbnail?.url || project.thumbnail || "",
+      imageUrls: project.images?.map((img) => img?.url || img).join(", ") || "",
     });
+    setThumbnailFile(null);
+    setImageFiles([]);
     setIsModalOpen(true);
   };
 
@@ -77,18 +86,44 @@ const ManageProjects = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const payload = {
-        ...formData,
-        technologies: formData.technologies
-          .split(",")
-          .map((t) => t.trim())
-          .filter(Boolean),
-      };
+      const hasFiles = thumbnailFile || imageFiles.length > 0;
 
-      if (editingProject) {
-        await api.put(`/projects/${editingProject._id}`, payload);
+      if (hasFiles) {
+        const data = new FormData();
+        data.append("title", formData.title);
+        data.append("description", formData.description);
+        data.append("technologies", formData.technologies);
+        data.append("liveUrl", formData.liveUrl);
+        data.append("githubUrl", formData.githubUrl);
+        data.append("category", formData.category);
+        if (formData.thumbnail) data.append("thumbnailUrl", formData.thumbnail);
+        if (formData.imageUrls) data.append("imageUrls", formData.imageUrls);
+        if (thumbnailFile) data.append("thumbnail", thumbnailFile);
+        imageFiles.forEach((file) => data.append("images", file));
+
+        if (editingProject) {
+          await api.put(`/projects/${editingProject._id}`, data, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+        } else {
+          await api.post("/projects", data, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+        }
       } else {
-        await api.post("/projects", payload);
+        const payload = {
+          ...formData,
+          technologies: formData.technologies
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean),
+        };
+
+        if (editingProject) {
+          await api.put(`/projects/${editingProject._id}`, payload);
+        } else {
+          await api.post("/projects", payload);
+        }
       }
 
       await fetchProjects();
@@ -167,11 +202,11 @@ const ManageProjects = () => {
       </div>
 
       {/* Modal */}
-      {isModalOpen && (
-        <Modal
-          title={editingProject ? "Edit Project" : "Add Project"}
-          onClose={closeModal}
-        >
+      <Modal
+        isOpen={isModalOpen}
+        title={editingProject ? "Edit Project" : "Add Project"}
+        onClose={closeModal}
+      >
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="text"
@@ -180,7 +215,7 @@ const ManageProjects = () => {
               onChange={handleChange}
               placeholder="Project Title"
               required
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <textarea
               name="description"
@@ -189,7 +224,7 @@ const ManageProjects = () => {
               placeholder="Description"
               rows="4"
               required
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <input
               type="text"
@@ -197,7 +232,7 @@ const ManageProjects = () => {
               value={formData.technologies}
               onChange={handleChange}
               placeholder="Technologies (comma separated)"
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <input
               type="text"
@@ -205,7 +240,7 @@ const ManageProjects = () => {
               value={formData.category}
               onChange={handleChange}
               placeholder="Category"
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <input
               type="url"
@@ -213,7 +248,7 @@ const ManageProjects = () => {
               value={formData.liveUrl}
               onChange={handleChange}
               placeholder="Live URL"
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <input
               type="url"
@@ -221,7 +256,7 @@ const ManageProjects = () => {
               value={formData.githubUrl}
               onChange={handleChange}
               placeholder="GitHub URL"
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <input
               type="text"
@@ -229,8 +264,41 @@ const ManageProjects = () => {
               value={formData.thumbnail}
               onChange={handleChange}
               placeholder="Thumbnail URL"
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
+            <input
+              type="text"
+              name="imageUrls"
+              value={formData.imageUrls}
+              onChange={handleChange}
+              placeholder="Image URLs (comma separated)"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
+                  Thumbnail Upload
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
+                  className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
+                  Project Images (up to 5)
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={(e) => setImageFiles(Array.from(e.target.files || []))}
+                  className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+            </div>
 
             <div className="flex justify-end gap-3 pt-4">
               <Button type="button" variant="secondary" onClick={closeModal}>
@@ -241,10 +309,10 @@ const ManageProjects = () => {
               </Button>
             </div>
           </form>
-        </Modal>
-      )}
+      </Modal>
     </div>
   );
 };
 
 export default ManageProjects;
+

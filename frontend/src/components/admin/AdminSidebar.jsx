@@ -7,10 +7,14 @@ const AdminSidebar = () => {
 
   const navItems = [
     { name: "Dashboard", path: "/admin", exact: true },
+    { name: "About", path: "/admin/about" },
     { name: "Projects", path: "/admin/projects" },
     { name: "Blogs", path: "/admin/blogs" },
     { name: "Skills", path: "/admin/skills" },
     { name: "Experience", path: "/admin/experience" },
+    { name: "Education", path: "/admin/education" },
+    { name: "Certifications", path: "/admin/certifications" },
+    { name: "Testimonials", path: "/admin/testimonials" },
     { name: "Messages", path: "/admin/messages" },
   ];
 

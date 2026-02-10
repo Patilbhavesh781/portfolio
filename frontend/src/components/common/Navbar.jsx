@@ -3,7 +3,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../hooks/useAuth";
 
-const Navbar = () => {
+const Navbar = ({ variant = "fixed" }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const { user, isAuthenticated, logout } = useAuth();
@@ -23,8 +23,13 @@ const Navbar = () => {
     { name: "Contact", path: "/contact" },
   ];
 
+  const headerClasses =
+    variant === "fixed"
+      ? "fixed top-0 left-0 w-full z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur shadow-sm"
+      : "sticky top-0 left-0 w-full z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800";
+
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur shadow-sm">
+    <header className={headerClasses}>
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="text-xl font-bold tracking-tight text-indigo-600 dark:text-indigo-400">

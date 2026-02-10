@@ -8,12 +8,11 @@ const AboutIntro = () => {
   const [about, setAbout] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   useEffect(() => {
     const fetchAbout = async () => {
       try {
         const response = await api.get("/about");
-        setAbout(response.data);
+        setAbout(response.data?.data || response.data);
       } catch (err) {
         setError("Failed to load about information.");
       } finally {
@@ -36,7 +35,7 @@ const AboutIntro = () => {
           <img
             src={about.profileImage || "/assets/images/profile.png"}
             alt={about.fullName}
-            className="w-64 h-64 sm:w-80 sm:h-80 object-cover rounded-2xl shadow-lg"
+            className="w-64 h-64 sm:w-80 sm:h-80 object-cover object-top rounded-2xl shadow-lg"
           />
         </div>
 

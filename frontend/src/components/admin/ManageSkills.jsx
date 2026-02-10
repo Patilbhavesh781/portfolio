@@ -26,7 +26,7 @@ const ManageSkills = () => {
   const fetchSkills = async () => {
     try {
       const response = await api.get("/skills");
-      setSkills(response.data);
+      setSkills(response.data?.data || []);
     } catch (err) {
       setError("Failed to load skills.");
     } finally {
@@ -63,10 +63,15 @@ const ManageSkills = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const payload = {
+        ...formData,
+        level: formData.level === "" ? undefined : Number(formData.level),
+        category: formData.category || undefined,
+      };
       if (editingSkill) {
-        await api.put(`/skills/${editingSkill._id}`, formData);
+        await api.put(`/skills/${editingSkill._id}`, payload);
       } else {
-        await api.post("/skills", formData);
+        await api.post("/skills", payload);
       }
 
       await fetchSkills();
@@ -145,11 +150,11 @@ const ManageSkills = () => {
       </div>
 
       {/* Modal */}
-      {isModalOpen && (
-        <Modal
-          title={editingSkill ? "Edit Skill" : "Add Skill"}
-          onClose={closeModal}
-        >
+      <Modal
+        isOpen={isModalOpen}
+        title={editingSkill ? "Edit Skill" : "Add Skill"}
+        onClose={closeModal}
+      >
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="text"
@@ -158,31 +163,38 @@ const ManageSkills = () => {
               onChange={handleChange}
               placeholder="Skill Name"
               required
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <input
-              type="text"
+              type="number"
               name="level"
               value={formData.level}
               onChange={handleChange}
-              placeholder="Skill Level (e.g. Beginner, Intermediate, Expert)"
-              className="w-full px-4 py-2 border rounded-lg"
+              placeholder="Skill Level (1-100)"
+              min="1"
+              max="100"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
-            <input
-              type="text"
+            <select
               name="category"
               value={formData.category}
               onChange={handleChange}
-              placeholder="Category (e.g. Frontend, Backend, Tools)"
-              className="w-full px-4 py-2 border rounded-lg"
-            />
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="">Select Category</option>
+              <option value="frontend">Frontend</option>
+              <option value="backend">Backend</option>
+              <option value="devops">DevOps</option>
+              <option value="tools">Tools</option>
+              <option value="other">Other</option>
+            </select>
             <input
               type="text"
               name="icon"
               value={formData.icon}
               onChange={handleChange}
               placeholder="Icon URL or class"
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
 
             <div className="flex justify-end gap-3 pt-4">
@@ -194,10 +206,10 @@ const ManageSkills = () => {
               </Button>
             </div>
           </form>
-        </Modal>
-      )}
+      </Modal>
     </div>
   );
 };
 
 export default ManageSkills;
+

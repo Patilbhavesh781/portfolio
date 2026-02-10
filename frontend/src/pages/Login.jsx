@@ -6,7 +6,7 @@ import { useAuth } from "../hooks/useAuth";
 import { setSEO } from "../utils/seo";
 
 const Login = () => {
-  const { login, isAuthenticated, loading, error } = useAuth();
+  const { login, isAuthenticated, loginLoading, error } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -38,7 +38,11 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await login(formData.email, formData.password);
+    try {
+      await login({ email: formData.email, password: formData.password });
+    } catch (err) {
+      // Error is handled in auth context state
+    }
   };
 
   return (
@@ -58,7 +62,7 @@ const Login = () => {
             value={formData.email}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring"
+            className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
           <input
             type="password"
@@ -67,11 +71,11 @@ const Login = () => {
             value={formData.password}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring"
+            className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? <Loader size="sm" /> : "Login"}
+          <Button type="submit" className="w-full" disabled={loginLoading}>
+            {loginLoading ? <Loader size="sm" /> : "Login"}
           </Button>
         </form>
       </div>
@@ -80,3 +84,4 @@ const Login = () => {
 };
 
 export default Login;
+
