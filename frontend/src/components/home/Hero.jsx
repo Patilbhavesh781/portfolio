@@ -47,7 +47,7 @@ const Hero = () => {
         <div className="relative flex justify-center">
           <div className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center">
             <img
-              src="/assets/images/profile.png"
+              src="https://res.cloudinary.com/drf2rliqg/image/upload/v1770715631/portfolio/about/sojugsnp4epe8fryyzu7.jpg"
               alt="Profile"
               className="w-56 h-56 sm:w-72 sm:h-72 object-cover object-top rounded-full shadow-xl"
               onError={(e) => {

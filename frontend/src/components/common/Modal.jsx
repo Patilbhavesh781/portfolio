@@ -30,9 +30,9 @@ const Modal = ({
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4 overflow-auto">
       <div
-        className={`w-full ${sizeClasses[size]} bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden`}
+        className={`w-full ${sizeClasses[size]} bg-white dark:bg-gray-900 rounded-xl shadow-lg max-h-[90vh] flex flex-col`}
         role="dialog"
         aria-modal="true"
       >
@@ -53,7 +53,9 @@ const Modal = ({
         )}
 
         {/* Body */}
-        <div className="px-5 py-4">{children}</div>
+        <div className="px-5 py-4 overflow-y-auto overflow-x-auto max-h-[calc(90vh-80px)]">
+          {children}
+        </div>
 
         {/* Footer */}
         {footer && (

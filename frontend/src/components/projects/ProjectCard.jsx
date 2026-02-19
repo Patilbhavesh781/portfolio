@@ -2,13 +2,20 @@ import { Link } from "react-router-dom";
 import Button from "../common/Button";
 
 const ProjectCard = ({ project }) => {
+  const previewImage =
+    project.thumbnail?.url ||
+    project.thumbnail ||
+    project.images?.[0]?.url ||
+    project.images?.[0] ||
+    "";
+
   return (
     <div className="bg-white dark:bg-gray-900 rounded-xl shadow hover:shadow-lg transition overflow-hidden flex flex-col">
       {/* Image */}
-      {(project.thumbnail?.url || project.thumbnail) && (
+      {previewImage && (
         <div className="h-48 w-full overflow-hidden">
           <img
-            src={project.thumbnail?.url || project.thumbnail}
+            src={previewImage}
             alt={project.title}
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
           />

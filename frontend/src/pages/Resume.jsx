@@ -2,9 +2,26 @@ import { useEffect, useState } from "react";
 import ResumeViewer from "../components/resume/ResumeViewer";
 import DownloadButton from "../components/resume/DownloadButton";
 import { setSEO } from "../utils/seo";
+import api from "../services/api";
+
+const DEFAULT_RESUME_URL = "/assets/Bhavesh_Patil_Resume.pdf";
 
 const Resume = () => {
-  const [resumeUrl, setResumeUrl] = useState("/assets/resume.pdf");
+  const [resumeUrl, setResumeUrl] = useState(DEFAULT_RESUME_URL);
+
+  useEffect(() => {
+    const fetchResumeFromAbout = async () => {
+      try {
+        const response = await api.get("/about");
+        const aboutResumeUrl = response.data?.data?.resumeUrl;
+        setResumeUrl(aboutResumeUrl || DEFAULT_RESUME_URL);
+      } catch (error) {
+        setResumeUrl(DEFAULT_RESUME_URL);
+      }
+    };
+
+    fetchResumeFromAbout();
+  }, []);
 
   useEffect(() => {
     setSEO({
@@ -26,10 +43,13 @@ const Resume = () => {
       </div>
 
       <div className="flex justify-center">
-        <DownloadButton resumeUrl={resumeUrl} fileName="Your_Name_Resume.pdf" />
+        <DownloadButton
+          resumeUrl={resumeUrl}
+          fileName="Bhavesh_Patil_Resume.pdf"
+        />
       </div>
 
-      <ResumeViewer />
+      <ResumeViewer resumeUrl={resumeUrl} />
     </div>
   );
 };

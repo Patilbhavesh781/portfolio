@@ -29,6 +29,15 @@ const ProjectDetails = () => {
   if (error) return <p className="text-center text-red-600">{error}</p>;
   if (!project) return null;
 
+  const galleryImages = [
+    ...(project.thumbnail?.url || project.thumbnail
+      ? [project.thumbnail?.url || project.thumbnail]
+      : []),
+    ...((project.images || [])
+      .map((image) => image?.url || image)
+      .filter(Boolean)),
+  ].filter((url, index, arr) => arr.indexOf(url) === index);
+
   return (
     <section className="py-20 bg-white dark:bg-gray-900">
       <div className="max-w-5xl mx-auto px-6">
@@ -52,12 +61,12 @@ const ProjectDetails = () => {
         </p>
 
         {/* Image Gallery */}
-        {project.images?.length > 0 && (
+        {galleryImages.length > 0 && (
           <div className="grid gap-6 sm:grid-cols-2 mb-8">
-            {project.images.map((image, index) => (
+            {galleryImages.map((imageUrl, index) => (
               <img
                 key={index}
-                src={image?.url || image}
+                src={imageUrl}
                 alt={`${project.title} screenshot ${index + 1}`}
                 className="w-full h-64 object-cover rounded-xl shadow"
               />

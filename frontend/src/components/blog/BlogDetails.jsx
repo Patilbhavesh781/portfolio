@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import Loader from "../common/Loader";
 import Button from "../common/Button";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const BlogDetails = ({ blog, loading, error }) => {
   if (loading) return <Loader text="Loading blog..." />;
@@ -30,6 +32,19 @@ const BlogDetails = ({ blog, loading, error }) => {
           {blog.readTime && <span>{blog.readTime} min read</span>}
         </div>
 
+        {blog.tags?.length > 0 && (
+          <div className="mb-6 flex flex-wrap gap-2">
+            {blog.tags.map((tag, index) => (
+              <span
+                key={`${tag}-${index}`}
+                className="px-3 py-1 text-xs font-medium bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 rounded-full"
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
+
         {(blog.thumbnail || blog.coverImage?.url) && (
           <div className="mb-8">
             <img
@@ -41,7 +56,26 @@ const BlogDetails = ({ blog, loading, error }) => {
         )}
 
         <article className="prose prose-indigo dark:prose-invert max-w-none">
-          {blog.content}
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              pre: ({ children }) => (
+                <pre className="mb-6 overflow-x-auto rounded-lg bg-gray-900 text-gray-100 p-4 text-sm">
+                  {children}
+                </pre>
+              ),
+              code: ({ inline, children, ...props }) =>
+                inline ? (
+                  <code className="rounded bg-gray-100 dark:bg-gray-800 px-1 py-0.5" {...props}>
+                    {children}
+                  </code>
+                ) : (
+                  <code {...props}>{children}</code>
+                ),
+            }}
+          >
+            {blog.content || ""}
+          </ReactMarkdown>
         </article>
       </div>
     </section>

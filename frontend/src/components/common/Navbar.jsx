@@ -64,7 +64,7 @@ const Navbar = ({ variant = "fixed" }) => {
           </button>
 
           {/* Auth Buttons */}
-          {isAuthenticated ? (
+          {isAuthenticated && (
             <>
               {user?.role === "admin" && (
                 <NavLink
@@ -81,13 +81,6 @@ const Navbar = ({ variant = "fixed" }) => {
                 Logout
               </button>
             </>
-          ) : (
-            <NavLink
-              to="/login"
-              className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition"
-            >
-              Login
-            </NavLink>
           )}
         </div>
 
@@ -131,7 +124,7 @@ const Navbar = ({ variant = "fixed" }) => {
                 {theme === "dark" ? "🌙" : "☀️"}
               </button>
 
-              {isAuthenticated ? (
+              {isAuthenticated && (
                 <div className="flex items-center space-x-3">
                   {user?.role === "admin" && (
                     <NavLink
@@ -149,14 +142,6 @@ const Navbar = ({ variant = "fixed" }) => {
                     Logout
                   </button>
                 </div>
-              ) : (
-                <NavLink
-                  to="/login"
-                  onClick={() => setMenuOpen(false)}
-                  className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 transition"
-                >
-                  Login
-                </NavLink>
               )}
             </div>
           </div>
