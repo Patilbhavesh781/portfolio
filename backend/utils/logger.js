@@ -2,9 +2,29 @@ import winston from "winston";
 import path from "path";
 import fs from "fs";
 
-const logsDir = path.join("logs");
-if (!fs.existsSync(logsDir)) {
-  fs.mkdirSync(logsDir, { recursive: true });
+const isServerless =
+  process.env.VERCEL === "1" || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+
+let fileTransports = [];
+if (!isServerless) {
+  try {
+    const logsDir = path.join("logs");
+    if (!fs.existsSync(logsDir)) {
+      fs.mkdirSync(logsDir, { recursive: true });
+    }
+
+    fileTransports = [
+      new winston.transports.File({
+        filename: path.join(logsDir, "error.log"),
+        level: "error",
+      }),
+      new winston.transports.File({
+        filename: path.join(logsDir, "combined.log"),
+      }),
+    ];
+  } catch (error) {
+    fileTransports = [];
+  }
 }
 
 const logger = winston.createLogger({
@@ -14,19 +34,11 @@ const logger = winston.createLogger({
     winston.format.errors({ stack: true }),
     winston.format.json()
   ),
-  transports: [
-    new winston.transports.File({
-      filename: path.join(logsDir, "error.log"),
-      level: "error",
-    }),
-    new winston.transports.File({
-      filename: path.join(logsDir, "combined.log"),
-    }),
-  ],
+  transports: [...fileTransports],
 });
 
-// Also log to console in development
-if (process.env.NODE_ENV !== "production") {
+// Log to console in development and serverless
+if (process.env.NODE_ENV !== "production" || isServerless) {
   logger.add(
     new winston.transports.Console({
       format: winston.format.simple(),
