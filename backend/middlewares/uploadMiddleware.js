@@ -3,7 +3,12 @@ import path from "path";
 import fs from "fs";
 
 // Ensure temp upload directory exists
-const uploadPath = path.join("uploads", "temp");
+const isServerless =
+  process.env.VERCEL === "1" || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+const uploadPath = isServerless
+  ? path.join("/tmp", "uploads", "temp")
+  : path.join("uploads", "temp");
+
 if (!fs.existsSync(uploadPath)) {
   fs.mkdirSync(uploadPath, { recursive: true });
 }
