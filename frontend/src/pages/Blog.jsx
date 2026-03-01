@@ -11,9 +11,9 @@ const Blog = () => {
 
   useEffect(() => {
     setSEO({
-      title: "Blog | Your Name - Full Stack Developer",
+      title: "Blog | Bhavesh Patil - Full Stack Developer",
       description:
-        "Read articles and tutorials by Your Name on web development, MERN stack, React, Node.js, and software engineering best practices.",
+        "Read articles and tutorials by Bhavesh Patil on web development, MERN stack, React, Node.js, and software engineering best practices.",
       keywords:
         "Blog, Web Development, MERN Stack, React, JavaScript, Node.js, MongoDB",
     });

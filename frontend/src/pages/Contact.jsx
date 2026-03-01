@@ -6,9 +6,9 @@ import { setSEO } from "../utils/seo";
 const Contact = () => {
   useEffect(() => {
     setSEO({
-      title: "Contact | Your Name - Full Stack Developer",
+      title: "Contact | Bhavesh Patil - Full Stack Developer",
       description:
-        "Get in touch with Your Name for freelance work, job opportunities, collaborations, or technical consulting.",
+        "Get in touch with Bhavesh Patil for freelance work, job opportunities, collaborations, or technical consulting.",
       keywords:
         "Contact, Hire Developer, Freelance Developer, MERN Stack Developer, Software Engineer",
     });

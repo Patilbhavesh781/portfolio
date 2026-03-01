@@ -18,7 +18,7 @@ const ProjectPage = () => {
         setProject(data);
 
         setSEO({
-          title: `${data.title} | Your Name - Portfolio`,
+          title: `${data.title} | Bhavesh Patil - Portfolio`,
           description: data.description?.slice(0, 160),
           keywords: data.technologies?.join(", "),
         });

@@ -15,9 +15,9 @@ const Projects = () => {
 
   useEffect(() => {
     setSEO({
-      title: "Projects | Your Name - Full Stack Developer",
+      title: "Projects | Bhavesh Patil - Full Stack Developer",
       description:
-        "Explore real-world MERN stack projects by Your Name, including full stack apps, dashboards, APIs, and SaaS platforms.",
+        "Explore real-world MERN stack projects by Bhavesh Patil, including full stack apps, dashboards, APIs, and SaaS platforms.",
       keywords:
         "Projects, Portfolio, MERN Stack, Full Stack Developer, React Projects, Node.js, MongoDB",
     });

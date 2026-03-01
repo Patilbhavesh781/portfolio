@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import AppRoutes from "./routes/AppRoutes";
 import { useTheme } from "./context/ThemeContext";
+import ScrollToTop from "./components/common/ScrollToTop";
 
 const App = () => {
   const { theme } = useTheme();
@@ -13,7 +14,12 @@ const App = () => {
     }
   }, [theme]);
 
-  return <AppRoutes />;
+  return (
+    <>
+      <ScrollToTop />
+      <AppRoutes />
+    </>
+  );
 };
 
 export default App;

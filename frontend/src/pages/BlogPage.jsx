@@ -18,7 +18,7 @@ const BlogPage = () => {
         setBlog(data);
 
         setSEO({
-          title: `${data.title} | Your Name - Blog`,
+          title: `${data.title} | Bhavesh Patil - Blog`,
           description: data.excerpt || data.content?.slice(0, 160),
           keywords: data.tags?.join(", "),
         });

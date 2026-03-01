@@ -21,7 +21,7 @@ const Home = () => {
       <Hero />
       <TechStack />
       <Stats />
-      <Testimonials />
+      {/* <Testimonials /> */}
     </div>
   );
 };

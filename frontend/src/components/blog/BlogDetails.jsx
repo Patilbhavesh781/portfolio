@@ -1,8 +1,52 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Loader from "../common/Loader";
 import Button from "../common/Button";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+
+const CodeBlock = ({ className, children }) => {
+  const [copied, setCopied] = useState(false);
+  const match = /language-(\w+)/.exec(className || "");
+  const language = match?.[1] || "text";
+  const code = String(children).replace(/\n$/, "");
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    } catch (error) {
+      setCopied(false);
+    }
+  };
+
+  return (
+    <div className="mb-6 overflow-hidden rounded-lg border border-gray-700">
+      <div className="flex items-center justify-between bg-gray-800 px-3 py-2 text-xs text-gray-200">
+        <span className="font-medium uppercase tracking-wide">{language}</span>
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="rounded border border-gray-600 px-2 py-1 text-gray-200 hover:bg-gray-700"
+        >
+          {copied ? "Copied" : "Copy"}
+        </button>
+      </div>
+      <SyntaxHighlighter
+        language={language}
+        style={oneDark}
+        customStyle={{ margin: 0, borderRadius: 0, fontSize: "0.875rem" }}
+        wrapLongLines
+      >
+        {code}
+      </SyntaxHighlighter>
+    </div>
+  );
+};
 
 const BlogDetails = ({ blog, loading, error }) => {
   if (loading) return <Loader text="Loading blog..." />;
@@ -58,19 +102,16 @@ const BlogDetails = ({ blog, loading, error }) => {
         <article className="prose prose-indigo dark:prose-invert max-w-none">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw]}
             components={{
-              pre: ({ children }) => (
-                <pre className="mb-6 overflow-x-auto rounded-lg bg-gray-900 text-gray-100 p-4 text-sm">
-                  {children}
-                </pre>
-              ),
-              code: ({ inline, children, ...props }) =>
+              pre: ({ children }) => <>{children}</>,
+              code: ({ inline, className, children, ...props }) =>
                 inline ? (
                   <code className="rounded bg-gray-100 dark:bg-gray-800 px-1 py-0.5" {...props}>
                     {children}
                   </code>
                 ) : (
-                  <code {...props}>{children}</code>
+                  <CodeBlock className={className}>{children}</CodeBlock>
                 ),
             }}
           >

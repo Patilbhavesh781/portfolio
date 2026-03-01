@@ -1,6 +1,14 @@
 import Certification from "../models/Certification.js";
 import logger from "../utils/logger.js";
 import validateObjectId from "../utils/validateObjectId.js";
+import cloudinary from "../config/cloudinary.js";
+import fs from "fs";
+
+const uploadToCloudinary = async (filePath, folder) => {
+  const result = await cloudinary.uploader.upload(filePath, { folder });
+  fs.unlink(filePath, () => {});
+  return { public_id: result.public_id, url: result.secure_url };
+};
 
 // @desc    Get all certifications (public)
 // @route   GET /api/certifications
@@ -25,7 +33,18 @@ export const getCertifications = async (req, res, next) => {
 // @access  Private/Admin
 export const createCertification = async (req, res, next) => {
   try {
-    const certification = await Certification.create(req.body);
+    const data = { ...req.body };
+
+    if (req.file) {
+      data.logo = await uploadToCloudinary(
+        req.file.path,
+        "portfolio/certifications"
+      );
+    } else if (data.logoUrl) {
+      data.logo = { url: data.logoUrl };
+    }
+
+    const certification = await Certification.create(data);
 
     res.status(201).json({ success: true, data: certification });
   } catch (error) {
@@ -41,7 +60,18 @@ export const updateCertification = async (req, res, next) => {
   try {
     validateObjectId(req.params.id);
 
-    const certification = await Certification.findByIdAndUpdate(req.params.id, req.body, {
+    const data = { ...req.body };
+
+    if (req.file) {
+      data.logo = await uploadToCloudinary(
+        req.file.path,
+        "portfolio/certifications"
+      );
+    } else if (data.logoUrl) {
+      data.logo = { url: data.logoUrl };
+    }
+
+    const certification = await Certification.findByIdAndUpdate(req.params.id, data, {
       new: true,
       runValidators: true,
     });
@@ -67,6 +97,10 @@ export const deleteCertification = async (req, res, next) => {
     const certification = await Certification.findById(req.params.id);
     if (!certification) {
       return res.status(404).json({ message: "Certification not found" });
+    }
+
+    if (certification.logo?.public_id) {
+      await cloudinary.uploader.destroy(certification.logo.public_id);
     }
 
     await certification.deleteOne();

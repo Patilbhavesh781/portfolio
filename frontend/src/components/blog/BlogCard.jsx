@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const BlogCard = ({ blog }) => {
   return (
@@ -17,9 +19,21 @@ const BlogCard = ({ blog }) => {
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
           {blog.title}
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
-          {blog.excerpt || blog.content?.slice(0, 120) + "..."}
-        </p>
+        <div className="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              p: ({ children }) => <p className="inline">{children}</p>,
+              code: ({ children }) => (
+                <code className="rounded bg-gray-100 dark:bg-gray-800 px-1 py-0.5">
+                  {children}
+                </code>
+              ),
+            }}
+          >
+            {blog.excerpt || `${blog.content?.slice(0, 160) || ""}...`}
+          </ReactMarkdown>
+        </div>
 
         <div className="mt-auto flex items-center justify-between">
           <Link

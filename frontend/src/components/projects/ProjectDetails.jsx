@@ -56,7 +56,7 @@ const ProjectDetails = () => {
         </h1>
 
         {/* Description */}
-        <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+        <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed whitespace-pre-line">
           {project.description}
         </p>
 

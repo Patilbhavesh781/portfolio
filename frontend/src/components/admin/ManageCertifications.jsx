@@ -19,7 +19,20 @@ const ManageCertifications = () => {
     expirationDate: "",
     credentialId: "",
     credentialUrl: "",
+    logoUrl: "",
   });
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState("");
+
+  useEffect(() => {
+    if (logoFile) {
+      const objectUrl = URL.createObjectURL(logoFile);
+      setLogoPreview(objectUrl);
+      return () => URL.revokeObjectURL(objectUrl);
+    }
+
+    setLogoPreview(formData.logoUrl || "");
+  }, [logoFile, formData.logoUrl]);
 
   useEffect(() => {
     fetchCertifications();
@@ -45,7 +58,9 @@ const ManageCertifications = () => {
       expirationDate: "",
       credentialId: "",
       credentialUrl: "",
+      logoUrl: "",
     });
+    setLogoFile(null);
     setIsModalOpen(true);
   };
 
@@ -62,7 +77,9 @@ const ManageCertifications = () => {
         : "",
       credentialId: cert.credentialId || "",
       credentialUrl: cert.credentialUrl || "",
+      logoUrl: cert.logo?.url || "",
     });
+    setLogoFile(null);
     setIsModalOpen(true);
   };
 
@@ -78,16 +95,39 @@ const ManageCertifications = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const payload = {
-        ...formData,
-        issueDate: formData.issueDate || undefined,
-        expirationDate: formData.expirationDate || undefined,
-      };
+      const hasFile = !!logoFile;
+      if (hasFile) {
+        const data = new FormData();
+        data.append("title", formData.title);
+        data.append("organization", formData.organization);
+        data.append("issueDate", formData.issueDate);
+        data.append("expirationDate", formData.expirationDate);
+        data.append("credentialId", formData.credentialId);
+        data.append("credentialUrl", formData.credentialUrl);
+        data.append("logoUrl", formData.logoUrl);
+        data.append("logo", logoFile);
 
-      if (editingCert) {
-        await api.put(`/certifications/${editingCert._id}`, payload);
+        if (editingCert) {
+          await api.put(`/certifications/${editingCert._id}`, data, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+        } else {
+          await api.post("/certifications", data, {
+            headers: { "Content-Type": "multipart/form-data" },
+          });
+        }
       } else {
-        await api.post("/certifications", payload);
+        const payload = {
+          ...formData,
+          issueDate: formData.issueDate || undefined,
+          expirationDate: formData.expirationDate || undefined,
+        };
+
+        if (editingCert) {
+          await api.put(`/certifications/${editingCert._id}`, payload);
+        } else {
+          await api.post("/certifications", payload);
+        }
       }
 
       await fetchCertifications();
@@ -222,6 +262,35 @@ const ManageCertifications = () => {
             placeholder="Credential URL"
             className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
+          <input
+            type="url"
+            name="logoUrl"
+            value={formData.logoUrl}
+            onChange={handleChange}
+            placeholder="Logo URL"
+            className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          />
+          <div>
+            <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
+              Logo Upload
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setLogoFile(e.target.files?.[0] || null)}
+              className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+          {logoPreview && (
+            <div className="rounded-lg border border-gray-300 dark:border-gray-700 p-3">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Logo Preview</p>
+              <img
+                src={logoPreview}
+                alt="Certification logo preview"
+                className="w-16 h-16 object-contain"
+              />
+            </div>
+          )}
 
           <div className="flex justify-end gap-3 pt-4">
             <Button type="button" variant="secondary" onClick={closeModal}>

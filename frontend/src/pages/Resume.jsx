@@ -25,9 +25,9 @@ const Resume = () => {
 
   useEffect(() => {
     setSEO({
-      title: "Resume | Your Name - Full Stack Developer",
+      title: "Resume | Bhavesh Patil - Full Stack Developer",
       description:
-        "View and download the professional resume of Your Name, a full stack MERN developer.",
+        "View and download the professional resume of Bhavesh Patil, a full stack MERN developer.",
       keywords:
         "Resume, CV, Full Stack Developer, MERN, React, Node.js, MongoDB",
     });
