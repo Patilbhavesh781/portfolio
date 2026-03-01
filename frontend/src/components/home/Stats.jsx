@@ -29,7 +29,7 @@ const Stats = () => {
   const items = [
     { label: "Projects", value: stats.projects || 0 },
     { label: "Blogs", value: stats.blogs || 0 },
-    { label: "Unread Messages", value: stats.messages || 0 },
+    // { label: "Unread Messages", value: stats.messages || 0 },
     { label: "Testimonials", value: stats.testimonials || 0 },
   ];
 

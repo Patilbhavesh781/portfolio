@@ -10,7 +10,7 @@ export const sendContactMessage = async (req, res, next) => {
   try {
     const { name, email, subject, message } = req.body;
 
-    const contactMessage = await ContactMessage.create({
+    await ContactMessage.create({
       name,
       email,
       subject,
@@ -19,16 +19,21 @@ export const sendContactMessage = async (req, res, next) => {
     });
 
     // Send email notification to admin (optional)
-    const canSendEmail =
-      process.env.ADMIN_EMAIL &&
-      process.env.MAIL_HOST &&
-      process.env.MAIL_USER &&
-      process.env.MAIL_PASS;
+    const adminRecipient =
+      process.env.ADMIN_EMAIL ||
+      process.env.MAIL_TO ||
+      process.env.MAIL_USER ||
+      process.env.EMAIL_USER;
 
-    if (canSendEmail) {
+    const hasMailerConfig =
+      (process.env.MAIL_HOST || process.env.EMAIL_HOST) &&
+      (process.env.MAIL_USER || process.env.EMAIL_USER) &&
+      (process.env.MAIL_PASS || process.env.EMAIL_PASS);
+
+    if (adminRecipient && hasMailerConfig) {
       try {
         await sendEmail({
-          to: process.env.ADMIN_EMAIL,
+          to: adminRecipient,
           subject: `New Contact Message: ${subject || "No Subject"}`,
           html: `
             <h3>New Contact Message</h3>
@@ -36,12 +41,14 @@ export const sendContactMessage = async (req, res, next) => {
             <p><strong>Email:</strong> ${email}</p>
             <p><strong>Subject:</strong> ${subject || "N/A"}</p>
             <p><strong>Message:</strong></p>
-            <p>${message}</p>
+            <p>${String(message || "").replace(/\n/g, "<br>")}</p>
           `,
         });
       } catch (emailError) {
-        logger.error(emailError);
+        logger.error(`Contact saved but email notification failed: ${emailError.message}`);
       }
+    } else {
+      logger.warn("Contact saved without email notification. Missing ADMIN_EMAIL/MAIL_TO or mail credentials.");
     }
 
     res.status(201).json({

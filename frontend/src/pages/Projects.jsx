@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import ProjectList from "../components/projects/ProjectList";
 import ProjectFilter from "../components/projects/ProjectFilter";
 import Loader from "../components/common/Loader";
+import ScrollReveal from "../components/common/ScrollReveal";
 import { getAllProjects } from "../services/projectService";
 import { setSEO } from "../utils/seo";
 
@@ -73,19 +74,25 @@ const Projects = () => {
 
   return (
     <div className="space-y-12">
-      <div className="text-center max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold mb-4">Projects</h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          A curated collection of my best work across frontend, backend, and full stack development.
-        </p>
-      </div>
+      <ScrollReveal>
+        <div className="text-center max-w-3xl mx-auto">
+          <h1 className="text-4xl font-bold mb-4">Projects</h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            A curated collection of my best work across frontend, backend, and full stack development.
+          </p>
+        </div>
+      </ScrollReveal>
 
-      <ProjectFilter
-        onFilterChange={handleFilterChange}
-        categories={categories}
-        technologies={technologies}
-      />
-      <ProjectList projects={filteredProjects} />
+      <ScrollReveal delay={0.05}>
+        <ProjectFilter
+          onFilterChange={handleFilterChange}
+          categories={categories}
+          technologies={technologies}
+        />
+      </ScrollReveal>
+      <ScrollReveal delay={0.08}>
+        <ProjectList projects={filteredProjects} />
+      </ScrollReveal>
     </div>
   );
 };

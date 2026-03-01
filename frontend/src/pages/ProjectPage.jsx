@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ProjectDetails from "../components/projects/ProjectDetails";
 import Loader from "../components/common/Loader";
+import ScrollReveal from "../components/common/ScrollReveal";
 import { getProjectById } from "../services/projectService";
 import { setSEO } from "../utils/seo";
 
@@ -36,7 +37,11 @@ const ProjectPage = () => {
   if (error) return <p className="text-center text-red-600">{error}</p>;
   if (!project) return null;
 
-  return <ProjectDetails project={project} />;
+  return (
+    <ScrollReveal amount={0.1} y={20}>
+      <ProjectDetails project={project} />
+    </ScrollReveal>
+  );
 };
 
 export default ProjectPage;

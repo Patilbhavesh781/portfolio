@@ -22,6 +22,10 @@ const statsSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    visitors: {
+      type: Number,
+      default: 0,
+    },
     lastUpdated: {
       type: Date,
       default: Date.now,

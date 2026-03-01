@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import BlogDetails from "../components/blog/BlogDetails";
 import Loader from "../components/common/Loader";
+import ScrollReveal from "../components/common/ScrollReveal";
 import { getBlogById } from "../services/blogService";
 import { setSEO } from "../utils/seo";
 
@@ -36,7 +37,11 @@ const BlogPage = () => {
   if (error) return <p className="text-center text-red-600">{error}</p>;
   if (!blog) return null;
 
-  return <BlogDetails blog={blog} loading={loading} error={error} />;
+  return (
+    <ScrollReveal amount={0.1} y={20}>
+      <BlogDetails blog={blog} loading={loading} error={error} />
+    </ScrollReveal>
+  );
 };
 
 export default BlogPage;

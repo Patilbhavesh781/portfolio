@@ -7,6 +7,7 @@ const AdminSidebar = () => {
 
   const navItems = [
     { name: "Dashboard", path: "/admin", exact: true },
+    { name: "Analytics", path: "/admin/stats" },
     { name: "About", path: "/admin/about" },
     { name: "Projects", path: "/admin/projects" },
     { name: "Blogs", path: "/admin/blogs" },

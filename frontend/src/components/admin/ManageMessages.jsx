@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import api from "../../services/api";
 import Loader from "../common/Loader";
 import Button from "../common/Button";
+import Modal from "../common/Modal";
 
 const ManageMessages = () => {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedMessage, setSelectedMessage] = useState(null);
 
   useEffect(() => {
     fetchMessages();
@@ -100,6 +102,13 @@ const ManageMessages = () => {
                   {msg.isRead ? "Read" : "Unread"}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => setSelectedMessage(msg)}
+                  >
+                    View
+                  </Button>
                   {!msg.isRead && (
                     <Button size="sm" variant="secondary" onClick={() => handleMarkRead(msg._id)}>
                       Mark Read
@@ -114,6 +123,42 @@ const ManageMessages = () => {
           </tbody>
         </table>
       </div>
+
+      <Modal
+        isOpen={!!selectedMessage}
+        onClose={() => setSelectedMessage(null)}
+        title="Message Details"
+        size="lg"
+      >
+        {selectedMessage && (
+          <div className="space-y-4 text-sm text-gray-700 dark:text-gray-300">
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">Name</p>
+              <p>{selectedMessage.name}</p>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">Email</p>
+              <p>{selectedMessage.email}</p>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">Subject</p>
+              <p>{selectedMessage.subject || "N/A"}</p>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">Message</p>
+              <p className="whitespace-pre-wrap break-words">{selectedMessage.message}</p>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">Received</p>
+              <p>{new Date(selectedMessage.createdAt).toLocaleString()}</p>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">Status</p>
+              <p>{selectedMessage.isRead ? "Read" : "Unread"}</p>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

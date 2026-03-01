@@ -3,6 +3,7 @@ import TechStack from "../components/home/TechStack";
 import Stats from "../components/home/Stats";
 import Testimonials from "../components/home/Testimonials";
 import { useEffect } from "react";
+import ScrollReveal from "../components/common/ScrollReveal";
 import { setSEO } from "../utils/seo";
 
 const Home = () => {
@@ -18,9 +19,17 @@ const Home = () => {
 
   return (
     <div className="space-y-24">
-      <Hero />
-      <TechStack />
-      <Stats />
+      <ScrollReveal y={30} amount={0.25}>
+        <Hero />
+      </ScrollReveal>
+
+      <ScrollReveal y={40} delay={0.05}>
+        <TechStack />
+      </ScrollReveal>
+
+      <ScrollReveal y={40} delay={0.1}>
+        <Stats />
+      </ScrollReveal>
       {/* <Testimonials /> */}
     </div>
   );

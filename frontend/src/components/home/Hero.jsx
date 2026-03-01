@@ -1,9 +1,52 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Button from "../common/Button";
 import { useAuth } from "../../hooks/useAuth";
 
+const TYPING_WORDS = [
+  "Full Stack Developer",
+  // "Machine Learning",
+  // "Backend Engineering",
+  "Frontend Designer",
+];
+
 const Hero = () => {
   const { user, isAuthenticated } = useAuth();
+  const [wordIndex, setWordIndex] = useState(0);
+  const [typedText, setTypedText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const currentWord = TYPING_WORDS[wordIndex];
+    let delay = isDeleting ? 60 : 110;
+
+    if (!isDeleting && typedText === currentWord) {
+      delay = 2200;
+    } else if (isDeleting && typedText === "") {
+      delay = 300;
+    }
+
+    const timeoutId = setTimeout(() => {
+      if (!isDeleting && typedText === currentWord) {
+        setIsDeleting(true);
+        return;
+      }
+
+      if (isDeleting && typedText === "") {
+        setIsDeleting(false);
+        setWordIndex((prev) => (prev + 1) % TYPING_WORDS.length);
+        return;
+      }
+
+      setTypedText((prev) =>
+        isDeleting
+          ? currentWord.slice(0, Math.max(prev.length - 1, 0))
+          : currentWord.slice(0, prev.length + 1)
+      );
+    }, delay);
+
+    return () => clearTimeout(timeoutId);
+  }, [typedText, isDeleting, wordIndex]);
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800">
@@ -16,7 +59,18 @@ const Hero = () => {
               Bhavesh Patil
             </span>
             <br />
-            Full Stack Developer
+            <span className="inline-block min-h-[0.6em]">
+              {" "}
+              <span className="text-indigo-600 dark:text-indigo-400 text-[0.99em]">
+                {typedText}
+              </span>
+              <span
+                className="animate-pulse text-indigo-600 dark:text-indigo-400 ml-1"
+                style={{ animationIterationCount: "infinite" }}
+              >
+                |
+              </span>
+            </span>
           </h1>
 
           <p className="mt-6 text-lg text-gray-600 dark:text-gray-400 max-w-xl">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import BlogList from "../components/blog/BlogList";
 import Loader from "../components/common/Loader";
+import ScrollReveal from "../components/common/ScrollReveal";
 import { getAllBlogs } from "../services/blogService";
 import { setSEO } from "../utils/seo";
 
@@ -39,14 +40,18 @@ const Blog = () => {
 
   return (
     <div className="space-y-12">
-      <div className="text-center max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold mb-4">Blog</h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Insights, tutorials, and thoughts on modern web development and software engineering.
-        </p>
-      </div>
+      <ScrollReveal>
+        <div className="text-center max-w-3xl mx-auto">
+          <h1 className="text-4xl font-bold mb-4">Blog</h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Insights, tutorials, and thoughts on modern web development and software engineering.
+          </p>
+        </div>
+      </ScrollReveal>
 
-      <BlogList blogs={blogs} />
+      <ScrollReveal delay={0.05}>
+        <BlogList blogs={blogs} />
+      </ScrollReveal>
     </div>
   );
 };

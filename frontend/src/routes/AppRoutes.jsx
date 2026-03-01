@@ -23,6 +23,7 @@ import ManageEducation from "../components/admin/ManageEducation";
 import ManageCertifications from "../components/admin/ManageCertifications";
 import ManageAbout from "../components/admin/ManageAbout";
 import ManageTestimonials from "../components/admin/ManageTestimonials";
+import Analytics from "../components/admin/Analytics";
 
 const AppRoutes = () => {
   return (
@@ -46,6 +47,7 @@ const AppRoutes = () => {
       {/* Admin Routes */}
       <Route element={<AdminLayout />}>
       <Route path="/admin/dashboard" element={<Dashboard />} />
+      <Route path="/admin/stats" element={<Analytics />} />
       <Route path="/admin/about" element={<ManageAbout />} />
       <Route path="/admin/projects" element={<ManageProjects />} />
       <Route path="/admin/blogs" element={<ManageBlogs />} />

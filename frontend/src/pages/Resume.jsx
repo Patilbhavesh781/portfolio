@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import ResumeViewer from "../components/resume/ResumeViewer";
 import DownloadButton from "../components/resume/DownloadButton";
+import ScrollReveal from "../components/common/ScrollReveal";
 import { setSEO } from "../utils/seo";
 import api from "../services/api";
 
@@ -35,21 +36,27 @@ const Resume = () => {
 
   return (
     <div className="space-y-12">
-      <div className="text-center max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold mb-4">Resume</h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          View or download my latest professional resume below.
-        </p>
-      </div>
+      <ScrollReveal>
+        <div className="text-center max-w-3xl mx-auto">
+          <h1 className="text-4xl font-bold mb-4">Resume</h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            View or download my latest professional resume below.
+          </p>
+        </div>
+      </ScrollReveal>
 
-      <div className="flex justify-center">
-        <DownloadButton
-          resumeUrl={resumeUrl}
-          fileName="Bhavesh_Patil_Resume.pdf"
-        />
-      </div>
+      <ScrollReveal delay={0.05}>
+        <div className="flex justify-center">
+          <DownloadButton
+            resumeUrl={resumeUrl}
+            fileName="Bhavesh_Patil_Resume.pdf"
+          />
+        </div>
+      </ScrollReveal>
 
-      <ResumeViewer resumeUrl={resumeUrl} />
+      <ScrollReveal delay={0.08}>
+        <ResumeViewer resumeUrl={resumeUrl} />
+      </ScrollReveal>
     </div>
   );
 };
