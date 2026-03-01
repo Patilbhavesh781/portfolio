@@ -23,22 +23,47 @@ dotenv.config();
 const app = express();
 
 // Middleware
+const normalizeOrigin = (value = "") => value.trim().replace(/\/+$/, "");
+
 const allowedOrigins = (
   process.env.CLIENT_URLS ||
   process.env.CLIENT_URL ||
   "http://localhost:5173,http://127.0.0.1:5173"
 )
   .split(",")
-  .map((origin) => origin.trim())
+  .map((origin) => normalizeOrigin(origin))
   .filter(Boolean);
+
+const allowPreviewOrigins = process.env.ALLOW_PREVIEW_ORIGINS !== "false";
 
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow non-browser tools and same-origin requests without Origin header
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      return callback(new Error("Not allowed by CORS"));
+
+      const normalizedOrigin = normalizeOrigin(origin);
+      if (allowedOrigins.includes(normalizedOrigin)) {
+        return callback(null, true);
+      }
+
+      // Optional convenience for deployment previews
+      if (allowPreviewOrigins) {
+        try {
+          const { hostname } = new URL(normalizedOrigin);
+          if (
+            hostname.endsWith(".netlify.app") ||
+            hostname.endsWith(".vercel.app")
+          ) {
+            return callback(null, true);
+          }
+        } catch (error) {
+          // ignore URL parse errors and fall through to reject
+        }
+      }
+
+      // Do not throw server error for CORS mismatch
+      return callback(null, false);
     },
     credentials: true,
   })
