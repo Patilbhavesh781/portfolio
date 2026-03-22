@@ -11,6 +11,7 @@ const ManageTestimonials = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTestimonial, setEditingTestimonial] = useState(null);
+  const [selectedTestimonial, setSelectedTestimonial] = useState(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -196,6 +197,9 @@ const ManageTestimonials = () => {
                   {t.isApproved ? "Approved" : "Pending"}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                  <Button size="sm" variant="secondary" onClick={() => setSelectedTestimonial(t)}>
+                    View
+                  </Button>
                   <Button size="sm" variant="secondary" onClick={() => openEditModal(t)}>
                     Edit
                   </Button>
@@ -213,6 +217,7 @@ const ManageTestimonials = () => {
         isOpen={isModalOpen}
         title={editingTestimonial ? "Edit Testimonial" : "Add Testimonial"}
         onClose={closeModal}
+        size="xl"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
@@ -318,6 +323,56 @@ const ManageTestimonials = () => {
             </Button>
           </div>
         </form>
+      </Modal>
+
+      <Modal
+        isOpen={!!selectedTestimonial}
+        title="Testimonial Details"
+        onClose={() => setSelectedTestimonial(null)}
+        size="xl"
+      >
+        {selectedTestimonial && (
+          <div className="space-y-4 text-sm text-gray-700 dark:text-gray-300">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Name</p>
+                <p>{selectedTestimonial.name}</p>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Role</p>
+                <p>{selectedTestimonial.role || "-"}</p>
+              </div>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Company</p>
+                <p>{selectedTestimonial.company || "-"}</p>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Rating</p>
+                <p>{selectedTestimonial.rating || 5}</p>
+              </div>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">Status</p>
+              <p>{selectedTestimonial.isApproved ? "Approved" : "Pending"}</p>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">Message</p>
+              <p className="whitespace-pre-wrap break-words">{selectedTestimonial.message}</p>
+            </div>
+            {selectedTestimonial.avatar?.url || selectedTestimonial.avatar ? (
+              <div>
+                <p className="mb-2 font-semibold text-gray-900 dark:text-gray-100">Avatar</p>
+                <img
+                  src={selectedTestimonial.avatar?.url || selectedTestimonial.avatar}
+                  alt={selectedTestimonial.name}
+                  className="h-24 w-24 rounded-full object-cover"
+                />
+              </div>
+            ) : null}
+          </div>
+        )}
       </Modal>
     </div>
   );

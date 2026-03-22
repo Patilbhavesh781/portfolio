@@ -20,6 +20,12 @@ const projectSchema = new mongoose.Schema(
     longDescription: {
       type: String,
     },
+    startDate: {
+      type: Date,
+    },
+    endDate: {
+      type: Date,
+    },
     technologies: [
       {
         type: String,

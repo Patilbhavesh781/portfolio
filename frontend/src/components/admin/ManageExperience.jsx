@@ -11,6 +11,7 @@ const ManageExperience = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingExperience, setEditingExperience] = useState(null);
+  const [selectedExperience, setSelectedExperience] = useState(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -161,6 +162,9 @@ const ManageExperience = () => {
                   {exp.startDate ? new Date(exp.startDate).toLocaleDateString() : ""} - {exp.isCurrent ? "Present" : exp.endDate ? new Date(exp.endDate).toLocaleDateString() : "Present"}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                  <Button size="sm" variant="secondary" onClick={() => setSelectedExperience(exp)}>
+                    View
+                  </Button>
                   <Button size="sm" variant="secondary" onClick={() => openEditModal(exp)}>
                     Edit
                   </Button>
@@ -179,6 +183,7 @@ const ManageExperience = () => {
         isOpen={isModalOpen}
         title={editingExperience ? "Edit Experience" : "Add Experience"}
         onClose={closeModal}
+        size="xl"
       >
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
@@ -261,6 +266,48 @@ const ManageExperience = () => {
               </Button>
             </div>
           </form>
+      </Modal>
+
+      <Modal
+        isOpen={!!selectedExperience}
+        title="Experience Details"
+        onClose={() => setSelectedExperience(null)}
+        size="xl"
+      >
+        {selectedExperience && (
+          <div className="space-y-4 text-sm text-gray-700 dark:text-gray-300">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Title</p>
+                <p>{selectedExperience.title}</p>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Company</p>
+                <p>{selectedExperience.company}</p>
+              </div>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Location</p>
+                <p>{selectedExperience.location || "-"}</p>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Duration</p>
+                <p>
+                  {selectedExperience.startDate ? new Date(selectedExperience.startDate).toLocaleDateString() : "N/A"} - {selectedExperience.isCurrent ? "Present" : selectedExperience.endDate ? new Date(selectedExperience.endDate).toLocaleDateString() : "Present"}
+                </p>
+              </div>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">Technologies</p>
+              <p className="break-words">{selectedExperience.technologies?.join(", ") || "-"}</p>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">Description</p>
+              <p className="whitespace-pre-wrap break-words">{selectedExperience.description}</p>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );

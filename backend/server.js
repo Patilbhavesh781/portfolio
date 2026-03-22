@@ -8,24 +8,29 @@ import { configureCloudinary } from "./config/cloudinary.js";
 dotenv.config();
 
 const PORT = process.env.PORT || 5000;
-
-// Connect to MongoDB
-connectDB();
-configureCloudinary();
-
 const server = http.createServer(app);
 
-server.listen(PORT, () => {
-  logger.info(`🚀 Server running on port ${PORT}`);
-});
+const startServer = async () => {
+  try {
+    await connectDB();
+    configureCloudinary();
 
-// Handle unhandled promise rejections
+    server.listen(PORT, () => {
+      logger.info(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    logger.error(`Startup failed: ${error.message}`);
+    process.exit(1);
+  }
+};
+
+startServer();
+
 process.on("unhandledRejection", (err) => {
   logger.error(`Unhandled Rejection: ${err.message}`);
   server.close(() => process.exit(1));
 });
 
-// Handle uncaught exceptions
 process.on("uncaughtException", (err) => {
   logger.error(`Uncaught Exception: ${err.message}`);
   process.exit(1);

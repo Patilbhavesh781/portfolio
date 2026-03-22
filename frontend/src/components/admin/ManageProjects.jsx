@@ -11,10 +11,13 @@ const ManageProjects = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(null);
 
   const [formData, setFormData] = useState({
     title: "",
     description: "",
+    startDate: "",
+    endDate: "",
     technologies: "",
     liveUrl: "",
     githubUrl: "",
@@ -45,6 +48,8 @@ const ManageProjects = () => {
     setFormData({
       title: "",
       description: "",
+      startDate: "",
+      endDate: "",
       technologies: "",
       liveUrl: "",
       githubUrl: "",
@@ -62,6 +67,8 @@ const ManageProjects = () => {
     setFormData({
       title: project.title || "",
       description: project.description || "",
+      startDate: project.startDate ? new Date(project.startDate).toISOString().split("T")[0] : "",
+      endDate: project.endDate ? new Date(project.endDate).toISOString().split("T")[0] : "",
       technologies: project.technologies?.join(", ") || "",
       liveUrl: project.liveUrl || "",
       githubUrl: project.githubUrl || "",
@@ -92,6 +99,8 @@ const ManageProjects = () => {
         const data = new FormData();
         data.append("title", formData.title);
         data.append("description", formData.description);
+        if (formData.startDate) data.append("startDate", formData.startDate);
+        if (formData.endDate) data.append("endDate", formData.endDate);
         data.append("technologies", formData.technologies);
         data.append("liveUrl", formData.liveUrl);
         data.append("githubUrl", formData.githubUrl);
@@ -118,6 +127,9 @@ const ManageProjects = () => {
             .map((t) => t.trim())
             .filter(Boolean),
         };
+
+        if (!payload.startDate) delete payload.startDate;
+        if (!payload.endDate) delete payload.endDate;
 
         if (editingProject) {
           await api.put(`/projects/${editingProject._id}`, payload);
@@ -147,9 +159,9 @@ const ManageProjects = () => {
   if (error) return <p className="text-center text-red-600">{error}</p>;
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Manage Projects
         </h1>
@@ -157,8 +169,8 @@ const ManageProjects = () => {
       </div>
 
       {/* Projects Table */}
-      <div className="overflow-x-auto bg-white dark:bg-gray-900 rounded-xl shadow">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+      <div className="w-full max-w-full overflow-x-auto rounded-xl bg-white shadow dark:bg-gray-900">
+        <table className="min-w-[860px] w-full divide-y divide-gray-200 dark:divide-gray-800">
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -170,6 +182,9 @@ const ManageProjects = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Tech Stack
               </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                Timeline
+              </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Actions
               </th>
@@ -178,16 +193,24 @@ const ManageProjects = () => {
           <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
             {projects.map((project) => (
               <tr key={project._id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                <td className="max-w-[220px] break-words px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                   {project.title}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
                   {project.category || "-"}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                <td className="max-w-[320px] break-words px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                   {project.technologies?.join(", ") || "-"}
                 </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                  {project.startDate || project.endDate
+                    ? `${project.startDate ? new Date(project.startDate).toLocaleDateString() : "N/A"} - ${project.endDate ? new Date(project.endDate).toLocaleDateString() : "Present"}`
+                    : "-"}
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                  <Button size="sm" variant="secondary" onClick={() => setSelectedProject(project)}>
+                    View
+                  </Button>
                   <Button size="sm" variant="secondary" onClick={() => openEditModal(project)}>
                     Edit
                   </Button>
@@ -206,8 +229,9 @@ const ManageProjects = () => {
         isOpen={isModalOpen}
         title={editingProject ? "Edit Project" : "Add Project"}
         onClose={closeModal}
+        size="xl"
       >
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="min-w-0 space-y-4">
             <input
               type="text"
               name="title"
@@ -226,6 +250,22 @@ const ManageProjects = () => {
               required
               className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <input
+                type="date"
+                name="startDate"
+                value={formData.startDate}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+              <input
+                type="date"
+                name="endDate"
+                value={formData.endDate}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
             <input
               type="text"
               name="technologies"
@@ -314,6 +354,62 @@ const ManageProjects = () => {
               </Button>
             </div>
           </form>
+      </Modal>
+
+      <Modal
+        isOpen={!!selectedProject}
+        title="Project Details"
+        onClose={() => setSelectedProject(null)}
+        size="xl"
+      >
+        {selectedProject && (
+          <div className="space-y-4 text-sm text-gray-700 dark:text-gray-300">
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">Title</p>
+              <p className="break-words">{selectedProject.title}</p>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">Description</p>
+              <p className="whitespace-pre-wrap break-words">{selectedProject.description}</p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Category</p>
+                <p>{selectedProject.category || "-"}</p>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Timeline</p>
+                <p>
+                  {selectedProject.startDate ? new Date(selectedProject.startDate).toLocaleDateString() : "N/A"} - {selectedProject.endDate ? new Date(selectedProject.endDate).toLocaleDateString() : "Present"}
+                </p>
+              </div>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">Technologies</p>
+              <p className="break-words">{selectedProject.technologies?.join(", ") || "-"}</p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Live URL</p>
+                <p className="break-all">{selectedProject.liveUrl || "-"}</p>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">GitHub URL</p>
+                <p className="break-all">{selectedProject.githubUrl || "-"}</p>
+              </div>
+            </div>
+            {selectedProject.thumbnail?.url || selectedProject.thumbnail ? (
+              <div>
+                <p className="mb-2 font-semibold text-gray-900 dark:text-gray-100">Thumbnail</p>
+                <img
+                  src={selectedProject.thumbnail?.url || selectedProject.thumbnail}
+                  alt={selectedProject.title}
+                  className="max-h-56 w-full rounded-lg object-cover"
+                />
+              </div>
+            ) : null}
+          </div>
+        )}
       </Modal>
     </div>
   );

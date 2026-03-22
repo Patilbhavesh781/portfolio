@@ -38,6 +38,15 @@ const ProjectDetails = () => {
       .filter(Boolean)),
   ].filter((url, index, arr) => arr.indexOf(url) === index);
 
+  const formatDate = (value) =>
+    value
+      ? new Date(value).toLocaleDateString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        })
+      : null;
+
   return (
     <section className="py-20 bg-white dark:bg-gray-900">
       <div className="max-w-5xl mx-auto px-6">
@@ -54,6 +63,14 @@ const ProjectDetails = () => {
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
           {project.title}
         </h1>
+
+        {(project.startDate || project.endDate) && (
+          <div className="mb-4">
+            <span className="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+              {formatDate(project.startDate) || "N/A"} - {formatDate(project.endDate) || "Present"}
+            </span>
+          </div>
+        )}
 
         {/* Description */}
         <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed whitespace-pre-line">

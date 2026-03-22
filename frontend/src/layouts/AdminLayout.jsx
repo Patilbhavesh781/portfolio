@@ -20,12 +20,14 @@ const AdminLayout = () => {
   }
 
   return (
-    <div className="min-h-screen flex bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div className="min-h-screen flex overflow-x-hidden bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <AdminSidebar />
-      <div className="flex-1 flex flex-col">
+      <div className="flex min-w-0 flex-1 flex-col overflow-x-hidden">
         <Navbar variant="static" />
-        <main className="p-4 md:p-6">
-          <Outlet />
+        <main className="min-w-0 overflow-x-hidden p-4 md:p-6">
+          <div className="mx-auto w-full min-w-0 max-w-full">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

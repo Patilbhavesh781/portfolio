@@ -36,6 +36,8 @@ const AppRoutes = () => {
         <Route path="/projects/:id" element={<ProjectPage />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:id" element={<BlogPage />} />
+        <Route path="/articles" element={<Blog contentType="article" />} />
+        <Route path="/articles/:id" element={<BlogPage />} />
         <Route path="/resume" element={<Resume />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
@@ -51,6 +53,7 @@ const AppRoutes = () => {
       <Route path="/admin/about" element={<ManageAbout />} />
       <Route path="/admin/projects" element={<ManageProjects />} />
       <Route path="/admin/blogs" element={<ManageBlogs />} />
+      <Route path="/admin/articles" element={<ManageBlogs contentType="article" />} />
       <Route path="/admin/skills" element={<ManageSkills />} />
       <Route path="/admin/experience" element={<ManageExperience />} />
       <Route path="/admin/education" element={<ManageEducation />} />

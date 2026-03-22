@@ -37,12 +37,13 @@ const uploadToCloudinary = async (filePath, folder) => {
 // @access  Public
 export const getBlogs = async (req, res, next) => {
   try {
-    const { featured, status, tag } = req.query;
+    const { featured, status, tag, type } = req.query;
 
     const filter = {};
     if (featured) filter.isFeatured = featured === "true";
     if (status) filter.status = status;
     if (tag) filter.tags = { $in: [tag] };
+    if (type && ["blog", "article"].includes(type)) filter.type = type;
 
     const blogs = await Blog.find(filter).sort({ publishedAt: -1, createdAt: -1 });
 
@@ -88,6 +89,9 @@ export const getBlogBySlug = async (req, res, next) => {
 export const createBlog = async (req, res, next) => {
   try {
     const blogData = { ...req.body };
+    blogData.type = ["blog", "article"].includes(blogData.type)
+      ? blogData.type
+      : "blog";
     const slugSource = blogData.slug || blogData.title;
     blogData.slug = await createUniqueSlug(slugSource);
 
@@ -125,6 +129,11 @@ export const updateBlog = async (req, res, next) => {
     validateObjectId(req.params.id);
 
     const updateData = { ...req.body };
+    if (updateData.type) {
+      updateData.type = ["blog", "article"].includes(updateData.type)
+        ? updateData.type
+        : "blog";
+    }
     if (updateData.slug || updateData.title) {
       const slugSource = updateData.slug || updateData.title;
       updateData.slug = await createUniqueSlug(slugSource, req.params.id);

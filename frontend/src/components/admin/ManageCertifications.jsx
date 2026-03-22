@@ -11,6 +11,7 @@ const ManageCertifications = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCert, setEditingCert] = useState(null);
+  const [selectedCert, setSelectedCert] = useState(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -192,6 +193,9 @@ const ManageCertifications = () => {
                     : "N/A"}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                  <Button size="sm" variant="secondary" onClick={() => setSelectedCert(cert)}>
+                    View
+                  </Button>
                   <Button size="sm" variant="secondary" onClick={() => openEditModal(cert)}>
                     Edit
                   </Button>
@@ -209,6 +213,7 @@ const ManageCertifications = () => {
         isOpen={isModalOpen}
         title={editingCert ? "Edit Certification" : "Add Certification"}
         onClose={closeModal}
+        size="xl"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
@@ -301,6 +306,56 @@ const ManageCertifications = () => {
             </Button>
           </div>
         </form>
+      </Modal>
+
+      <Modal
+        isOpen={!!selectedCert}
+        title="Certification Details"
+        onClose={() => setSelectedCert(null)}
+        size="xl"
+      >
+        {selectedCert && (
+          <div className="space-y-4 text-sm text-gray-700 dark:text-gray-300">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Title</p>
+                <p>{selectedCert.title}</p>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Organization</p>
+                <p>{selectedCert.organization}</p>
+              </div>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Issue Date</p>
+                <p>{selectedCert.issueDate ? new Date(selectedCert.issueDate).toLocaleDateString() : "N/A"}</p>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Expiration Date</p>
+                <p>{selectedCert.expirationDate ? new Date(selectedCert.expirationDate).toLocaleDateString() : "No expiry"}</p>
+              </div>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">Credential ID</p>
+              <p className="break-all">{selectedCert.credentialId || "-"}</p>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">Credential URL</p>
+              <p className="break-all">{selectedCert.credentialUrl || "-"}</p>
+            </div>
+            {selectedCert.logo?.url ? (
+              <div>
+                <p className="mb-2 font-semibold text-gray-900 dark:text-gray-100">Logo</p>
+                <img
+                  src={selectedCert.logo.url}
+                  alt={selectedCert.title}
+                  className="h-24 w-24 rounded-lg object-contain"
+                />
+              </div>
+            ) : null}
+          </div>
+        )}
       </Modal>
     </div>
   );

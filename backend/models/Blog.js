@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 
 const blogSchema = new mongoose.Schema(
   {
+    type: {
+      type: String,
+      enum: ["blog", "article"],
+      default: "blog",
+      index: true,
+    },
     title: {
       type: String,
       required: [true, "Blog title is required"],
@@ -17,10 +23,6 @@ const blogSchema = new mongoose.Schema(
       type: String,
       required: [true, "Blog excerpt is required"],
       maxlength: 300,
-    },
-    author: {
-      type: String,
-      trim: true,
     },
     author: {
       type: String,

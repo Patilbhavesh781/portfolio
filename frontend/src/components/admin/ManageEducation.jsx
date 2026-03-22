@@ -11,6 +11,7 @@ const ManageEducation = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEducation, setEditingEducation] = useState(null);
+  const [selectedEducation, setSelectedEducation] = useState(null);
 
   const [formData, setFormData] = useState({
     degree: "",
@@ -149,6 +150,9 @@ const ManageEducation = () => {
                   {edu.startYear} - {edu.endYear || "Present"}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                  <Button size="sm" variant="secondary" onClick={() => setSelectedEducation(edu)}>
+                    View
+                  </Button>
                   <Button size="sm" variant="secondary" onClick={() => openEditModal(edu)}>
                     Edit
                   </Button>
@@ -166,6 +170,7 @@ const ManageEducation = () => {
         isOpen={isModalOpen}
         title={editingEducation ? "Edit Education" : "Add Education"}
         onClose={closeModal}
+        size="xl"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
@@ -239,6 +244,46 @@ const ManageEducation = () => {
             </Button>
           </div>
         </form>
+      </Modal>
+
+      <Modal
+        isOpen={!!selectedEducation}
+        title="Education Details"
+        onClose={() => setSelectedEducation(null)}
+        size="lg"
+      >
+        {selectedEducation && (
+          <div className="space-y-4 text-sm text-gray-700 dark:text-gray-300">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Degree</p>
+                <p>{selectedEducation.degree}</p>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Institution</p>
+                <p>{selectedEducation.institution}</p>
+              </div>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Field of Study</p>
+                <p>{selectedEducation.fieldOfStudy || "-"}</p>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Years</p>
+                <p>{selectedEducation.startYear} - {selectedEducation.endYear || "Present"}</p>
+              </div>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">Grade</p>
+              <p>{selectedEducation.grade || "-"}</p>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">Description</p>
+              <p className="whitespace-pre-wrap break-words">{selectedEducation.description || "-"}</p>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );

@@ -11,6 +11,7 @@ const AdminSidebar = () => {
     { name: "About", path: "/admin/about" },
     { name: "Projects", path: "/admin/projects" },
     { name: "Blogs", path: "/admin/blogs" },
+    { name: "Articles", path: "/admin/articles" },
     { name: "Skills", path: "/admin/skills" },
     { name: "Experience", path: "/admin/experience" },
     { name: "Education", path: "/admin/education" },
@@ -20,7 +21,7 @@ const AdminSidebar = () => {
   ];
 
   return (
-    <aside className="w-64 bg-white dark:bg-gray-900 h-screen p-6 flex flex-col border-r border-gray-200 dark:border-gray-800">
+    <aside className="flex h-screen w-64 shrink-0 flex-col overflow-y-auto border-r border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
       {/* Logo / Title */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
@@ -39,7 +40,7 @@ const AdminSidebar = () => {
             to={item.path}
             end={item.exact}
             className={({ isActive }) =>
-              `block px-4 py-2 rounded-lg font-medium transition ${
+              `block break-words px-4 py-2 rounded-lg font-medium transition ${
                 isActive
                   ? "bg-indigo-600 text-white"
                   : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"

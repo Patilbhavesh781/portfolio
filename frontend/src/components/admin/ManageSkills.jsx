@@ -11,6 +11,7 @@ const ManageSkills = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSkill, setEditingSkill] = useState(null);
+  const [selectedSkill, setSelectedSkill] = useState(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -95,9 +96,9 @@ const ManageSkills = () => {
   if (error) return <p className="text-center text-red-600">{error}</p>;
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Manage Skills
         </h1>
@@ -105,8 +106,8 @@ const ManageSkills = () => {
       </div>
 
       {/* Skills Table */}
-      <div className="overflow-x-auto bg-white dark:bg-gray-900 rounded-xl shadow">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+      <div className="w-full max-w-full overflow-x-auto rounded-xl bg-white shadow dark:bg-gray-900">
+        <table className="min-w-[680px] w-full divide-y divide-gray-200 dark:divide-gray-800">
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -126,7 +127,7 @@ const ManageSkills = () => {
           <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-800">
             {skills.map((skill) => (
               <tr key={skill._id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                <td className="max-w-[240px] break-words px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                   {skill.name}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
@@ -136,6 +137,9 @@ const ManageSkills = () => {
                   {skill.category || "-"}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-3">
+                  <Button size="sm" variant="secondary" onClick={() => setSelectedSkill(skill)}>
+                    View
+                  </Button>
                   <Button size="sm" variant="secondary" onClick={() => openEditModal(skill)}>
                     Edit
                   </Button>
@@ -155,7 +159,7 @@ const ManageSkills = () => {
         title={editingSkill ? "Edit Skill" : "Add Skill"}
         onClose={closeModal}
       >
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="min-w-0 space-y-4">
             <input
               type="text"
               name="name"
@@ -206,6 +210,36 @@ const ManageSkills = () => {
               </Button>
             </div>
           </form>
+      </Modal>
+
+      <Modal
+        isOpen={!!selectedSkill}
+        title="Skill Details"
+        onClose={() => setSelectedSkill(null)}
+        size="lg"
+      >
+        {selectedSkill && (
+          <div className="space-y-4 text-sm text-gray-700 dark:text-gray-300">
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">Name</p>
+              <p className="break-words">{selectedSkill.name}</p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Level</p>
+                <p>{selectedSkill.level || "-"}</p>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-gray-100">Category</p>
+                <p>{selectedSkill.category || "-"}</p>
+              </div>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-gray-100">Icon</p>
+              <p className="break-all">{selectedSkill.icon || "-"}</p>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );
