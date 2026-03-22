@@ -11,19 +11,25 @@ import PageView from "../models/PageView.js";
 // @access  Public
 export const getStats = async (req, res, next) => {
   try {
-    const [projects, blogs, messages, testimonials, statsDoc] = await Promise.all([
-      Project.countDocuments(),
-      Blog.countDocuments({ status: "published" }),
-      ContactMessage.countDocuments({ isRead: false }),
-      Testimonial.countDocuments(),
-      Stats.findOne(),
-    ]);
+    const [projects, blogs, articles, messages, testimonials, statsDoc] =
+      await Promise.all([
+        Project.countDocuments(),
+        Blog.countDocuments({
+          status: "published",
+          $or: [{ type: "blog" }, { type: { $exists: false } }],
+        }),
+        Blog.countDocuments({ status: "published", type: "article" }),
+        ContactMessage.countDocuments({ isRead: false }),
+        Testimonial.countDocuments(),
+        Stats.findOne(),
+      ]);
 
     res.json({
       success: true,
       data: {
         projects,
         blogs,
+        articles,
         messages,
         testimonials,
         visitors: statsDoc?.visitors || 0,
@@ -103,7 +109,14 @@ export const getAnalyticsOverview = async (req, res, next) => {
     startDate.setDate(endDate.getDate() - (days - 1));
     startDate.setHours(0, 0, 0, 0);
 
-    const [uniqueVisitors, totalPageviews, durationAgg, groupedByDay] =
+    const [
+      uniqueVisitors,
+      totalPageviews,
+      durationAgg,
+      groupedByDay,
+      publishedBlogs,
+      publishedArticles,
+    ] =
       await Promise.all([
         PageView.distinct("sessionId", { createdAt: { $gte: startDate } }),
         PageView.countDocuments({ createdAt: { $gte: startDate } }),
@@ -136,6 +149,11 @@ export const getAnalyticsOverview = async (req, res, next) => {
           },
           { $sort: { _id: 1 } },
         ]),
+        Blog.countDocuments({
+          status: "published",
+          $or: [{ type: "blog" }, { type: { $exists: false } }],
+        }),
+        Blog.countDocuments({ status: "published", type: "article" }),
       ]);
 
     const dayMap = new Map(groupedByDay.map((row) => [row._id, row]));
@@ -161,6 +179,8 @@ export const getAnalyticsOverview = async (req, res, next) => {
         uniqueVisitors: uniqueVisitors.length,
         totalPageviews,
         avgVisitDurationSec,
+        publishedBlogs,
+        publishedArticles,
         chart,
       },
     });

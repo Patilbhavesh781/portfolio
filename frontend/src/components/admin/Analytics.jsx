@@ -57,9 +57,14 @@ const Analytics = () => {
         </select>
       </header>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <KpiCard label="Unique Visitors" value={analytics.uniqueVisitors} />
         <KpiCard label="Total Pageviews" value={analytics.totalPageviews} />
+        <KpiCard label="Published Blogs" value={analytics.publishedBlogs || 0} />
+        <KpiCard
+          label="Published Articles"
+          value={analytics.publishedArticles || 0}
+        />
         <KpiCard
           label="Visit Duration"
           value={formatDuration(analytics.avgVisitDurationSec || 0)}

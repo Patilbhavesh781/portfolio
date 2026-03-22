@@ -39,9 +39,10 @@ const Dashboard = () => {
         </p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-6">
         <StatCard title="Projects" value={stats.projects} />
         <StatCard title="Blogs" value={stats.blogs} />
+        <StatCard title="Articles" value={stats.articles || 0} />
         <StatCard title="Messages" value={stats.messages} />
         <StatCard title="Testimonials" value={stats.testimonials} />
         <StatCard title="Visitors" value={stats.visitors || 0} />
@@ -54,6 +55,7 @@ const Dashboard = () => {
         <ul className="space-y-2 text-gray-600 dark:text-gray-400">
           <li>Total Projects: {stats.projects}</li>
           <li>Published Blogs: {stats.blogs}</li>
+          <li>Published Articles: {stats.articles || 0}</li>
           <li>New Messages: {stats.messages}</li>
           <li>Testimonials Received: {stats.testimonials}</li>
           <li>Total Visitors: {stats.visitors || 0}</li>

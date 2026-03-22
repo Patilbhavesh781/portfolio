@@ -29,6 +29,7 @@ const Stats = () => {
   const items = [
     { label: "Projects", value: stats.projects || 0 },
     { label: "Blogs", value: stats.blogs || 0 },
+    { label: "Articles", value: stats.articles || 0 },
     // { label: "Unread Messages", value: stats.messages || 0 },
     { label: "Testimonials", value: stats.testimonials || 0 },
   ];
@@ -36,7 +37,7 @@ const Stats = () => {
   return (
     <section className="py-20 bg-gray-50 dark:bg-gray-800">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
+        <div className="grid grid-cols-2 gap-8 text-center sm:grid-cols-4 lg:grid-cols-5">
           {items.map((item, index) => (
             <div
               key={index}
